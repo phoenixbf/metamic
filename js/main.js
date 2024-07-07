@@ -2,7 +2,7 @@
 	Main js entry for MetaMic front-end
 
 ===============================================*/
-//import XX from "./XX.js";
+import Portal from "./portal.js";
 
 let APP = ATON.App.realize();
 window.APP = APP;
@@ -47,14 +47,20 @@ APP.setupEvents = ()=>{
     
         //ATON.Photon.connect();
     });
+
+    ATON.on("APP_portalRequest", d => {
+        APP.loadSpace(d.space);
+    });
 };
 
 
 // Spaces
 //========================================================
-APP.loadSpace = (spaceid)=>{
+APP.loadSpace = (spaceid, portalid)=>{
     let S = APP.confdata.spaces[spaceid];
     if (!S) return;
+
+    ATON.SceneHub.clear();
 
     let sid = S.sid;
     if (!sid) return;
@@ -64,7 +70,17 @@ APP.loadSpace = (spaceid)=>{
     });
 
     let portals = S.portals;
-    // realize SUI portals
+    
+    // realize Portals
+    for (let p in portals){
+        let dd = portals[p];
+
+        let P = new Portal(p);
+        P.setDestinationSpace(dd.dst);
+        P.realize();
+        P.getNode().setPosition(dd.pos[0],dd.pos[1],dd.pos[2]);
+        console.log(dd);
+    }
 };
 
 
