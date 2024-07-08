@@ -47,14 +47,14 @@ APP.setupEvents = ()=>{
         if (space) APP.loadSpace(space, portal);
     });
     
-    ATON.on("APP_SpaceLoaded", (spaceid)=>{
-        console.log("Space: '"+spaceid+"' loaded.");
+    ATON.on("APP_EnterSpace", (spaceid)=>{
+        console.log("Entered Space: '"+spaceid+"'");
     
         //ATON.Photon.connect();
     });
 
-    ATON.on("APP_portalRequest", d => {
-        APP.loadSpace(d.space);
+    ATON.on("APP_EnterPortalRequest", d => {
+        APP.loadSpace(d.space, d.portal);
     });
 };
 
@@ -84,7 +84,7 @@ APP.loadSpace = (spaceid, portalid)=>{
             console.log(portalid);
         }
 
-        ATON.fireEvent("APP_SpaceLoaded",spaceid);
+        ATON.fireEvent("APP_EnterSpace",spaceid);
     });
     
     // realize Portals

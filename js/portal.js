@@ -41,7 +41,7 @@ enter(){
     let dst = APP.confdata.spaces[this._dstSpace];
     if (!dst) return this;
 
-    ATON.fireEvent("APP_portalRequest", 
+    ATON.fireEvent("APP_EnterPortalRequest", 
         {
             space: this._dstSpace,
             portal: this._portid
