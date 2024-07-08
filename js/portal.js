@@ -1,8 +1,9 @@
-class Portal {
+class Portal extends ATON.Node {
 
-constructor(id){  
-    this._id = id;
-    this._node = undefined;
+constructor(portid){
+    super("P-"+portid, ATON.NTYPES.UI);
+
+    this._portid = portid;
 }
 
 setDestinationSpace(spaceid){
@@ -12,27 +13,29 @@ setDestinationSpace(spaceid){
 setLocation
 
 realize(){
-    this._node = ATON.createUINode("P-"+this._id);
 
     let mp = new THREE.Mesh( ATON.Utils.geomUnitSphere, ATON.MatHub.materials.rayController);
 
-    this._node.add( mp );
+    this.add( mp );
 
-    this._node.enablePicking().attachToRoot();
+    this.enablePicking();
 
     let self = this;
 
-    this._node.onHover = ()=>{
+    this.onHover = ()=>{
+        this.setScale(1.2);
         console.log("Hover");
-    }
-    this._node.onSelect = ()=>{
-        self.enter();
-    }
-};
+    };
 
-getNode(){
-    return this._node;
-}
+    this.onLeave = ()=>{
+        this.setScale(1.0);
+        console.log("Leave");
+    };
+
+    this.onSelect = ()=>{
+        self.enter();
+    };
+};
 
 enter(){
     let dst = APP.confdata.spaces[this._dstSpace];
@@ -41,7 +44,7 @@ enter(){
     ATON.fireEvent("APP_portalRequest", 
         {
             space: this._dstSpace,
-            portal: this._id
+            portal: this._portid
         });
 }
 
