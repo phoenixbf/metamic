@@ -10,9 +10,17 @@ window.APP = APP;
 APP.pathConfigFile   = APP.basePath + "config.json";
 APP.confdata = undefined;
 
+APP.MODE_INSPECTION = 0;
+APP.MODE_PUZZLE     = 1;
+
+
 // Setup
 //========================================================
 APP.setup = ()=>{
+
+    APP._mode = APP.MODE_INSPECTION;
+    
+    APP._currSpaceID = undefined;
 
     ATON.FE.realize(); // Realize the base front-end
 	ATON.FE.addBasicLoaderEvents(); // Add basic events handling
@@ -23,6 +31,10 @@ APP.setup = ()=>{
 
     APP.gPortals = ATON.createUINode();
     APP.gPortals.attachToRoot();
+};
+
+APP.setMode = (m)=>{
+    APP._mode = m;
 };
 
 // Config
@@ -47,13 +59,15 @@ APP.setupEvents = ()=>{
         if (space) APP.loadSpace(space, portal);
     });
     
-    ATON.on("APP_EnterSpace", (spaceid)=>{
+    ATON.on("APP_SpaceEnter", (spaceid)=>{
         console.log("Entered Space: '"+spaceid+"'");
+
+        APP.realizePortals();
     
         //ATON.Photon.connect();
     });
 
-    ATON.on("APP_EnterPortalRequest", d => {
+    ATON.on("APP_PortalEnterRequest", d => {
         APP.loadSpace(d.space, d.portal);
     });
 };
@@ -72,6 +86,8 @@ APP.loadSpace = (spaceid, portalid)=>{
     if (!sid) return;
 
     ATON.FE.loadSceneID( sid, ()=>{
+        APP._currSpaceID = spaceid;
+
         if (portalid && S.portals[portalid]){
             let P = S.portals[portalid];
     
@@ -84,17 +100,32 @@ APP.loadSpace = (spaceid, portalid)=>{
             console.log(portalid);
         }
 
-        ATON.fireEvent("APP_EnterSpace",spaceid);
+        ATON.fireEvent("APP_SpaceEnter",spaceid);
     });
-    
-    // realize Portals
+
+};
+
+APP.realizePortals = ()=>{
+    let S = APP.confdata.spaces[APP._currSpaceID];
+    if (!S) return;
+
     for (let p in S.portals){
         let dd = S.portals[p];
 
+        let pos = new THREE.Vector3(dd.pos[0],dd.pos[1],dd.pos[2]);
+        let dir = new THREE.Vector3(dd.dir[0],dd.dir[1],dd.dir[2]);
+
+        let dsp = APP.confdata.spaces[dd.dst];
+
         let P = new Portal(p);
-        P.setDestinationSpace(dd.dst);
         P.realize();
-        P.setPosition(dd.pos[0],dd.pos[1],dd.pos[2]).attachTo(APP.gPortals);
+
+        P.setDestinationSpace(dd.dst);
+        P.setTitle(dd.title);
+        P.setPosition(pos).attachTo(APP.gPortals);
+        P.setEnterDirection(dir);
+
+        P.setView(ATON.PATH_RESTAPI+"cover/" + dsp.sid);
 
         APP._portals[p] = P;
 
