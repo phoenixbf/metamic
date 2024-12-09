@@ -36,7 +36,7 @@ APP.setup = ()=>{
     APP.gPortals.attachToRoot();
 
     //ATON._mainRoot.background = ATON.MatHub.colors.white;
-    //ATON._mainRoot.fog = new THREE.FogExp2( new THREE.Color( 0.9,0.9,0.9 ), 0.08 );
+    //ATON._mainRoot.fog = new THREE.FogExp2( new THREE.Color( 0.9,0.9,0.9 ), 0.01 );
     //ATON._renderer.shadowMap.enabled = true;
 
     APP._CSM = undefined;
@@ -81,6 +81,32 @@ APP.setupShadows = ()=>{
     S.bias           = 0.0; //-0.0005;
 };
 
+APP.resetLayers = ()=>{
+    let numlayers = APP._layers.length;
+
+    let M = ATON.getSceneNode("main");
+
+    for (let i=1; i<numlayers; i++){
+        let L = ATON.getSceneNode(APP._layers[i]);
+        
+        //L.hide();
+/*
+        let axis = i%3;
+
+        if (axis===0) L.scale.x = 0.01;
+        if (axis===1) L.scale.y = 0.01;
+        if (axis===2) L.scale.z = 0.01;
+*/
+        L.scale.y = 0.05;
+        
+        //L.position.y = (((numlayers-i) * 0.1) / M.scale.x);
+        L.position.y = ((i * -0.15) / M.scale.x);
+    }
+
+    APP._currLayer = 0;
+    ATON.updateLightProbes();
+};
+
 // Events
 //========================================================
 APP.setupEvents = ()=>{
@@ -108,8 +134,6 @@ APP.setupEvents = ()=>{
 */
         let sc = APP.confdata.spaces[APP._currSpaceID];
 
-        let M = ATON.getSceneNode("main");
-
         // custom setup shadows
         APP.setupShadows();
 /*
@@ -123,24 +147,7 @@ APP.setupEvents = ()=>{
             }
         });
 */
-        let numlayers = APP._layers.length;
-
-        for (let i=1; i<numlayers; i++){
-            let L = ATON.getSceneNode(APP._layers[i]);
-            
-            //L.hide();
-/*
-            let axis = i%3;
-
-            if (axis===0) L.scale.x = 0.01;
-            if (axis===1) L.scale.y = 0.01;
-            if (axis===2) L.scale.z = 0.01;
-*/
-            L.scale.y = 0.05;
-            
-            //L.position.y = (((numlayers-i) * 0.1) / M.scale.x);
-            L.position.y = ((i * -0.15) / M.scale.x);
-        }
+        APP.resetLayers();
     });
     
     ATON.on("APP_SpaceEnter", (spaceid)=>{
@@ -163,6 +170,9 @@ APP.setupEvents = ()=>{
 		if (k==='a'){
             APP.requestNextLayerAnimation();
 		}
+        if (k==='r'){
+            APP.resetLayers();
+        }
     });
 };
 
