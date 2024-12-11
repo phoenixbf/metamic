@@ -41,6 +41,8 @@ APP.setup = ()=>{
 
     APP._CSM = undefined;
 
+    APP._P = undefined;
+
     // If our app required ore or more flares (plugins), we can also wait for them to be ready for specific setups
     ATON.on("AllFlaresReady",()=>{
 		// Do stuff
@@ -172,6 +174,16 @@ APP.setupEvents = ()=>{
 		}
         if (k==='r'){
             APP.resetLayers();
+        }
+
+        if (k==='s'){
+            let p = ATON.getSceneQueriedPoint();
+            if (!p) return;
+
+            if (!APP._P) APP._P = ATON.addClipPlane( new THREE.Vector3(0,-1,0), p );
+            else APP._P.constant = p.y;
+
+            ATON.updateLightProbes();
         }
     });
 };
