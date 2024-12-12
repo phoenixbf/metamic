@@ -102,7 +102,7 @@ APP.resetLayers = ()=>{
         L.scale.y = 0.05;
         
         //L.position.y = (((numlayers-i) * 0.1) / M.scale.x);
-        L.position.y = ((i * -0.15) / M.scale.x);
+        L.position.y = ((i * -0.25) / M.scale.x);
     }
 
     APP._currLayer = 0;
@@ -217,6 +217,9 @@ APP.loadSpace = (spaceid, portalid)=>{
     
             console.log(portalid);
         }
+
+        // Collab
+        ATON.Photon.connect("metamic-"+spaceid);
 
         ATON.fireEvent("APP_SpaceEnter",spaceid);
     });
