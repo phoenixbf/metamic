@@ -155,7 +155,8 @@ APP.setupEvents = ()=>{
     ATON.on("APP_SpaceEnter", (spaceid)=>{
         console.log("Entered Space: '"+spaceid+"'");
 
-        APP.realizePortals();
+        if (spaceid === "intro") APP.realizeIntroSpace();
+        else APP.realizePortals();
     
         //ATON.Photon.connect();
     });
@@ -257,6 +258,31 @@ APP.realizePortals = ()=>{
 APP.clearPortals = ()=>{
     APP.gPortals.removeChildren();
     APP._portals = {};
+};
+
+// Intro Space
+//========================================================
+APP.realizeIntroSpace = ()=>{
+    let root = ATON.getRootScene();
+
+    let g   = new THREE.PlaneGeometry( 30, 30 );
+    let mat = new THREE.MeshStandardMaterial();
+    mat.color = new THREE.Color(0.1,0.1,0.1);
+
+    let N = ATON.createSceneNode().rotateX(-Math.PI * 0.5);
+    N.add( new THREE.Mesh(g, mat) ); // ATON.MatHub.materials.fullyTransparent
+    N.enablePicking();
+
+    N.attachToRoot();
+
+    ATON._bqScene = true;
+
+    // Lights
+    const spot = new THREE.SpotLight( 0xffffff );
+    spot.position.set( 0, 3, 0 );
+    spot.intensity = 50;
+    root.add(spot)
+
 };
 
 
