@@ -3,12 +3,19 @@
 
 ===============================================*/
 import Portal from "./portal.js";
+import MATS from "./materials.js";
+import Totem from "./totem.js";
 
 let APP = ATON.App.realize();
 //APP.requireFlares(["myFlare"]);
 window.APP = APP;
 
+APP.MATS  = MATS;
+APP.Totem = Totem;
+
 APP.pathConfigFile   = APP.basePath + "config.json";
+APP.pathResAssets    = APP.basePath + "assets/";
+
 APP.confdata = undefined;
 
 APP.MODE_INSPECTION = 0;
@@ -25,8 +32,14 @@ APP.setup = ()=>{
     APP._layers = [];
     APP._currLayer = 0;
 
+    // Totems (intro)
+    APP._totems = {};
+    APP._currTotem = undefined;
+
     ATON.FE.realize(); // Realize the base front-end
 	ATON.FE.addBasicLoaderEvents(); // Add basic events handling
+
+    APP.MATS.init();
 
     APP.setupEvents();
 
@@ -134,6 +147,8 @@ APP.setupEvents = ()=>{
             camera: ATON.Nav._camera
         });
 */
+        if (APP._currSpaceID === "intro") return;
+
         let sc = APP.confdata.spaces[APP._currSpaceID];
 
         // custom setup shadows
@@ -163,6 +178,15 @@ APP.setupEvents = ()=>{
 
     ATON.on("APP_PortalEnterRequest", d => {
         APP.loadSpace(d.space, d.portal);
+    });
+
+    ATON.on("TotemEnterProximity",spaceid => {
+        console.log("Enter "+spaceid)
+        APP._currTotem = spaceid;
+    });
+    ATON.on("TotemLeaveProximity",spaceid => {
+        console.log("Leave "+spaceid)
+        APP._currTotem = spaceid;
     });
 
     // Keyb
@@ -260,31 +284,122 @@ APP.clearPortals = ()=>{
     APP._portals = {};
 };
 
+// Plane utility
+APP.createPlane = (xsize, zsize, material)=>{
+    let g = new THREE.PlaneGeometry( xsize, zsize );
+
+    let N = ATON.createSceneNode().rotateX(-Math.PI * 0.5);
+    N.add( new THREE.Mesh(g, material) ); // ATON.MatHub.materials.fullyTransparent
+
+    return N;
+};
+
 // Intro Space
 //========================================================
 APP.realizeIntroSpace = ()=>{
-    let root = ATON.getRootScene();
-
-    let g   = new THREE.PlaneGeometry( 30, 30 );
-    let mat = new THREE.MeshStandardMaterial();
-    mat.color = new THREE.Color(0.1,0.1,0.1);
-
-    let N = ATON.createSceneNode().rotateX(-Math.PI * 0.5);
-    N.add( new THREE.Mesh(g, mat) ); // ATON.MatHub.materials.fullyTransparent
-    N.enablePicking();
-
-    N.attachToRoot();
+    let G = APP.createPlane(30,30, APP.MATS.introGround);
+    G.enablePicking().attachToRoot();
 
     ATON._bqScene = true;
 
+    const totems = APP.confdata.spaces.intro.totems;
+    if (!totems) return;
+
+    for (let s in totems){
+        const S = totems[s];
+
+        APP._totems[S.dst] = new Totem(S.dst);
+        APP._totems[S.dst].setPosition(S.pos[0], 0.0, S.pos[1]);
+        APP._totems[S.dst].realize();
+
+        APP._totems[S.dst].attachToRoot();
+    }
+
+    ATON.Utils.loadTexture(APP.pathResAssets+ "cshadow.jpg", (tex)=>{
+        APP.MATS.cshadow.map = tex;
+        APP.MATS.cshadow.needsUpdate = true;
+    });
+
+    ATON.Utils.loadTexture(APP.pathResAssets+ "spotray.jpg", (tex)=>{
+        APP.MATS.introSpotRay.map = tex;
+        APP.MATS.introSpotRay.needsUpdate = true;
+    });
+
+    
+
     // Lights
+/*
     const spot = new THREE.SpotLight( 0xffffff );
     spot.position.set( 0, 3, 0 );
     spot.intensity = 50;
     root.add(spot)
-
+*/
 };
 
+/*
+APP.realizeStand = (d)=>{
+    const spotH = 2.5;
+
+    let root = ATON.getRootScene();
+
+    let N = ATON.createSceneNode();
+    N.setPosition(d.pos[0],0,d.pos[0]).attachToRoot();
+
+    // Base
+    let base = ATON.createSceneNode();
+    base.add( new THREE.Mesh(ATON.Utils.geomUnitCube, APP.MATS.introStand) );
+    base.setPosition(0,0.5,0);
+    base.attachTo(N);
+    base.disablePicking();
+
+    let G = APP.createPlane(2.8,2.8, MATS.cshadow);
+    G.setPosition(0,-0.48,0);
+    G.attachTo(base);
+    G.disablePicking();
+
+
+    // Light
+    let spot = new THREE.SpotLight( 0xffffff );
+    spot.position.set( 0, spotH, 0 );
+    spot.target = base;
+    spot.intensity = 30;
+    spot.penumbra = 0.3;
+    spot.angle = Math.PI/5;
+
+    N.add(spot);
+
+    // Godrays
+    let gr = new THREE.PlaneGeometry( 3,3 );
+    let grMesh = new THREE.Mesh(gr, APP.MATS.introSpotRay);
+    grMesh.position.y = 1.5;
+    grMesh.raycast = ATON.Utils.VOID_CAST;
+
+    let T = new THREE.Vector3();
+    grMesh.onAfterRender = ()=>{
+        T.copy( ATON.Nav.getCurrentEyeLocation() );
+        T.y = 1.5;
+        grMesh.lookAt( T );
+    };
+
+    N.add(grMesh);
+
+
+    // Maquette
+    let A = ATON.createSceneNode();
+    A.load(APP.pathResAssets+"maquettes/"+d.dst+".glb", ()=>{
+        A.autoFit(new THREE.Vector3(0,0,0), 0.5);
+        A.setPosition(0,1,0);
+        A.setMaterial(MATS.intromaquette);
+        A.disablePicking();
+
+        A.onAfterRender = ()=>{
+            console.log("x")
+        };
+    });
+
+    A.attachTo(N);
+};
+*/
 
 // Update
 //========================================================
@@ -321,9 +436,20 @@ APP.handleLayerAnimation = ()=>{
     }
 };
 
+APP.handleTotems = ()=>{
+    if (APP._currSpaceID !== "intro") return;
+
+    for (let t in APP._totems){
+        const T = APP._totems[t];
+        T.update();
+    }
+};
+
 APP.update = ()=>{
     APP.handleLayerAnimation();
     if (APP._CSM) APP._CSM.update();
+
+    APP.handleTotems();
 };
 
 
