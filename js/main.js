@@ -294,10 +294,46 @@ APP.createPlane = (xsize, zsize, material)=>{
     return N;
 };
 
+APP.createDrawingMesh = (path, sx,sy)=>{
+
+    let panel = new THREE.Mesh( new THREE.PlaneGeometry(1,1));
+	panel.material = new THREE.MeshStandardMaterial({
+		//side: THREE.DoubleSide
+	});
+
+    let yratio = 1.0;
+	let size   = 1.0;
+
+    ATON.Utils.loadTexture(path, (tex) => {
+		if (tex.image){
+			yratio = tex.image.height / tex.image.width;
+			
+			//if (tex.image.height > tex.image.width) size = tex.image.height;
+			//else size = tex.image.width;
+
+            size = max(tex.image.height, tex.image.width);
+		}
+
+		tex.flipY = false;
+		tex.colorSpace = ATON._stdEncoding;
+		
+        //tex.wrapS = THREE.RepeatWrapping;
+		//tex.wrapT = THREE.RepeatWrapping;
+
+		panel.scale.y = -yratio;
+		panel.scale.z = 1.0/size;
+
+		panel.material.map = tex;
+		panel.material.needsUpdate = true;
+	});
+
+    return panel;
+};
+
 // Intro Space
 //========================================================
 APP.realizeIntroSpace = ()=>{
-    let G = APP.createPlane(30,30, APP.MATS.introGround);
+    let G = APP.createPlane(20,20, APP.MATS.introGround);
     G.enablePicking().attachToRoot();
 
     ATON._bqScene = true;

@@ -58,13 +58,23 @@ realize(){
     // Maquette
     this.maquette = ATON.createSceneNode();
     this.maquette.load(APP.pathResAssets+"maquettes/"+this._spaceid+".glb", ()=>{
-        this.maquette.autoFit(new THREE.Vector3(0,0,0), 0.5);
-        this.maquette.setPosition(0,1,0);
-        this.maquette.setMaterial( APP.MATS.intromaquette );
+        this.maquette.autoFit(new THREE.Vector3(0,0,0), 0.6);
+        this.maquette.setPosition(0,1.05,0);
+        this.maquette.setMaterial( APP.MATS.maquette );
         this.maquette.disablePicking();
+        //this.maquette.renderOrder = 10;
 
         this._mqScale = this.maquette.scale.y;
         //this.maquette.scale.y = this._mqScale * 0.01;
+
+        this.drawing = this.maquette.clone();
+        this.drawing.setPosition(0,1,0); // -0.5
+        this.drawing.scale.y = this._mqScale * 0.01;
+        this.drawing.setMaterial(APP.MATS.maquetteproj);
+        this.drawing.disablePicking();
+        //this.drawing.renderOrder = 100;
+
+        this.drawing.attachTo(this);
     });
 
     this.maquette.attachTo( this );
@@ -77,11 +87,15 @@ update(){
     if (sd > this._dsProximity){
         if (this._bProxUser) ATON.fire("TotemLeaveProximity", this._spaceid);
         this._bProxUser = false;
+
+        //if (this.maquette.scale.y > 0.001) this.maquette.scale.y *= 0.9;
         return;
     }
 
     if (!this._bProxUser) ATON.fire("TotemEnterProximity", this._spaceid);
     this._bProxUser = true;
+
+    //if (this.maquette.scale.y < this._mqScale) this.maquette.scale.y *= 1.1;
 
     if (sd > this._dsActivation) return;
 
