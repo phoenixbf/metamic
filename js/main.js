@@ -17,6 +17,7 @@ APP.pathConfigFile   = APP.basePath + "config.json";
 APP.pathResAssets    = APP.basePath + "assets/";
 
 APP.confdata = undefined;
+APP.PATH_DRAWINGS = undefined;
 
 APP.MODE_INSPECTION = 0;
 APP.MODE_PUZZLE     = 1;
@@ -74,6 +75,8 @@ APP.loadConfig = ()=>{
         console.log("Loaded config");
 
         APP.confdata = data;
+
+        APP.PATH_DRAWINGS = APP.confdata.drawingspath;
 
         ATON.fireEvent("APP_ConfigLoaded");
     });
@@ -183,10 +186,21 @@ APP.setupEvents = ()=>{
     ATON.on("TotemEnterProximity",spaceid => {
         console.log("Enter "+spaceid)
         APP._currTotem = spaceid;
+
+        return;
+
+        for (let t in APP._totems){
+            if (t !== spaceid) APP._totems[t].switchOff();
+            else APP._totems[t].switchOn();
+        }
     });
     ATON.on("TotemLeaveProximity",spaceid => {
         console.log("Leave "+spaceid)
-        APP._currTotem = spaceid;
+        APP._currTotem = undefined;
+
+        return;
+
+        for (let t in APP._totems) APP._totems[t].switchOn();
     });
 
     // Keyb
@@ -222,6 +236,8 @@ APP.loadSpace = (spaceid, portalid)=>{
 
     ATON.SceneHub.clear();
     APP.clearPortals();
+
+    ATON.SUI.showSelector(false);
 
     let sid = S.sid;
     if (!sid) return;
@@ -295,6 +311,7 @@ APP.createPlane = (xsize, zsize, material)=>{
 };
 
 APP.createDrawingMesh = (path, sx,sy)=>{
+    path = ATON.Utils.resolveCollectionURL(path);
 
     let panel = new THREE.Mesh( new THREE.PlaneGeometry(1,1));
 	panel.material = new THREE.MeshStandardMaterial({
@@ -311,7 +328,7 @@ APP.createDrawingMesh = (path, sx,sy)=>{
 			//if (tex.image.height > tex.image.width) size = tex.image.height;
 			//else size = tex.image.width;
 
-            size = max(tex.image.height, tex.image.width);
+            size = Math.max(tex.image.height, tex.image.width);
 		}
 
 		tex.flipY = false;
@@ -345,6 +362,7 @@ APP.realizeIntroSpace = ()=>{
         const S = totems[s];
 
         APP._totems[S.dst] = new Totem(S.dst);
+        APP._totems[S.dst].addDrawings(S.drawings);
         APP._totems[S.dst].setPosition(S.pos[0], 0.0, S.pos[1]);
         APP._totems[S.dst].realize();
 
@@ -371,71 +389,6 @@ APP.realizeIntroSpace = ()=>{
     root.add(spot)
 */
 };
-
-/*
-APP.realizeStand = (d)=>{
-    const spotH = 2.5;
-
-    let root = ATON.getRootScene();
-
-    let N = ATON.createSceneNode();
-    N.setPosition(d.pos[0],0,d.pos[0]).attachToRoot();
-
-    // Base
-    let base = ATON.createSceneNode();
-    base.add( new THREE.Mesh(ATON.Utils.geomUnitCube, APP.MATS.introStand) );
-    base.setPosition(0,0.5,0);
-    base.attachTo(N);
-    base.disablePicking();
-
-    let G = APP.createPlane(2.8,2.8, MATS.cshadow);
-    G.setPosition(0,-0.48,0);
-    G.attachTo(base);
-    G.disablePicking();
-
-
-    // Light
-    let spot = new THREE.SpotLight( 0xffffff );
-    spot.position.set( 0, spotH, 0 );
-    spot.target = base;
-    spot.intensity = 30;
-    spot.penumbra = 0.3;
-    spot.angle = Math.PI/5;
-
-    N.add(spot);
-
-    // Godrays
-    let gr = new THREE.PlaneGeometry( 3,3 );
-    let grMesh = new THREE.Mesh(gr, APP.MATS.introSpotRay);
-    grMesh.position.y = 1.5;
-    grMesh.raycast = ATON.Utils.VOID_CAST;
-
-    let T = new THREE.Vector3();
-    grMesh.onAfterRender = ()=>{
-        T.copy( ATON.Nav.getCurrentEyeLocation() );
-        T.y = 1.5;
-        grMesh.lookAt( T );
-    };
-
-    N.add(grMesh);
-
-
-    // Maquette
-    let A = ATON.createSceneNode();
-    A.load(APP.pathResAssets+"maquettes/"+d.dst+".glb", ()=>{
-        A.autoFit(new THREE.Vector3(0,0,0), 0.5);
-        A.setPosition(0,1,0);
-        A.setMaterial(MATS.intromaquette);
-        A.disablePicking();
-
-        A.onAfterRender = ()=>{
-            console.log("x")
-        };
-    });
-
-    A.attachTo(N);
-};
-*/
 
 // Update
 //========================================================
@@ -474,6 +427,8 @@ APP.handleLayerAnimation = ()=>{
 
 APP.handleTotems = ()=>{
     if (APP._currSpaceID !== "intro") return;
+
+    APP.MATS.maquette.uniforms.time.value = ATON.getElapsedTime();
 
     for (let t in APP._totems){
         const T = APP._totems[t];

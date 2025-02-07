@@ -60,6 +60,7 @@ MATS.init = ()=>{
 */
     MATS.maquette = new THREE.ShaderMaterial({
         uniforms: {
+            time: { type:'float', value: 0.0 },
             tint: { type:'vec3', value: ATON.MatHub.colors.white },
             opacity: { type:'float', value: 0.5 }
         },
@@ -70,12 +71,15 @@ MATS.init = ()=>{
 		    varying vec3 vNormalW;
             varying vec3 vNormalV;
             uniform vec3 tint;
+            uniform float time;
             uniform float opacity;
 
 		    void main(){
-                vec4 A = vec4(1,1,1, opacity * 3.0);
-                vec4 B = vec4(1,1,1, opacity);
-                vec4 frag;
+                float t = cos((vPositionW.y * 5.0) - (time * 0.8));
+                //t = (t*100.0) - 95.0;
+                t = clamp(t, 0.0,1.0);
+
+                vec4 frag = vec4(1,1,1, opacity);
 
                 vec3 nw = normalize(vNormalW);
 
@@ -88,8 +92,10 @@ MATS.init = ()=>{
                 f = dot(nw, vec3(0,1,0));
                 f = clamp(f, 0.0,1.0);
 
-		        frag = mix(B,A, f);
+		        frag.a = mix(opacity, 1.0, f);
                 frag.a = mix(0.1,frag.a, h);
+
+                //frag.rgb = mix(frag.rgb, vec3(0,0,0), t); // * (1.0-f));
 
                 gl_FragColor = frag;
 		    }
