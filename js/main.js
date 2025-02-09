@@ -39,8 +39,9 @@ APP.setup = ()=>{
     APP._totems = {};
     APP._currTotem = undefined;
 
-    ATON.FE.realize(); // Realize the base front-end
-	ATON.FE.addBasicLoaderEvents(); // Add basic events handling
+    ATON.realize();
+    ATON.UI.addBasicEvents();
+    APP.setupUI();
 
     APP.MATS.init();
 
@@ -64,6 +65,15 @@ APP.setup = ()=>{
 		// Do stuff
 		console.log("All flares ready");
 	});
+};
+
+APP.setupUI = ()=>{
+    ATON.UI.get("toolbar").append(
+        //ATON.UI.createButtonBack(),
+        ATON.UI.createButtonVR(),
+        ATON.UI.createButtonAR(),
+        ATON.UI.createButtonDeviceOrientation()
+    );
 };
 
 APP.setMode = (m)=>{
@@ -255,7 +265,7 @@ APP.loadSpace = (spaceid, portalid)=>{
     let sid = S.sid;
     if (!sid) return;
 
-    ATON.FE.loadSceneID( sid, ()=>{
+    APP.loadScene( sid, ()=>{
         APP._currSpaceID = spaceid;
 
         APP._layers = S.modules;
@@ -285,6 +295,8 @@ APP.loadSpace = (spaceid, portalid)=>{
 
         // Collab
         ATON.Photon.connect("metamic-"+spaceid);
+
+        ATON.Nav.requestHomePOV();
 
         ATON.fire("APP_SpaceEnter",spaceid);
     });

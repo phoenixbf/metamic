@@ -1,0 +1,15 @@
+.metamic-logo {
+    bottom: 0px;
+    right: 0px;
+    position: absolute;
+
+    padding: 8px;
+    opacity: 0.7;
+
+    pointer-events: none;
+}
+
+.metamic-logo img {
+    width: 100px;
+    height: auto;
+}
