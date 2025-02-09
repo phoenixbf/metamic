@@ -130,7 +130,7 @@ setupMaterial(){
                 frag = mix(frag,vec4(tint,1), f);
 
                 float dd = dot(viewDirectionW, -vDir);
-                frag.a = mix(dd,1.0, f+0.5);
+                frag.a = mix(dd,1.0, f+0.2);
 
                 gl_FragColor = frag;
 		    }
