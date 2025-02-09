@@ -22,6 +22,8 @@ APP.PATH_DRAWINGS = undefined;
 APP.MODE_INSPECTION = 0;
 APP.MODE_PUZZLE     = 1;
 
+APP.STD_FOV = 70.0;
+
 
 // Setup
 //========================================================
@@ -83,6 +85,8 @@ APP.loadConfig = ()=>{
 };
 
 APP.setupShadows = ()=>{
+    if (!ATON._dMainL) return;
+
     let S = ATON._dMainL.shadow;
     if (!S) return;
 
@@ -100,6 +104,8 @@ APP.setupShadows = ()=>{
 };
 
 APP.resetLayers = ()=>{
+    if (!APP._layers) return;
+
     let numlayers = APP._layers.length;
 
     let M = ATON.getSceneNode("main");
@@ -136,7 +142,7 @@ APP.setupEvents = ()=>{
     });
 
     ATON.on("AllNodeRequestsCompleted", ()=>{
-        console.log(APP._layers);
+        //console.log(APP._layers);
 
         // CSM
 /*
@@ -155,7 +161,7 @@ APP.setupEvents = ()=>{
         let sc = APP.confdata.spaces[APP._currSpaceID];
 
         // custom setup shadows
-        APP.setupShadows();
+        //APP.setupShadows();
 /*
         M.traverse( ( o ) => {
             o.castShadow = true;
@@ -180,7 +186,11 @@ APP.setupEvents = ()=>{
     });
 
     ATON.on("APP_PortalEnterRequest", d => {
-        APP.loadSpace(d.space, d.portal);
+        let str = APP.basePath + "?s="+d.space;
+        if (d.portal) str += "&p="+d.portal;
+
+        //APP.loadSpace(d.space, d.portal);
+        window.location.href = str;
     });
 
     ATON.on("TotemEnterProximity",spaceid => {
@@ -234,8 +244,11 @@ APP.loadSpace = (spaceid, portalid)=>{
     let S = APP.confdata.spaces[spaceid];
     if (!S) return;
 
+
     ATON.SceneHub.clear();
     APP.clearPortals();
+    APP.clearTotems();
+
 
     ATON.SUI.showSelector(false);
 
@@ -249,11 +262,22 @@ APP.loadSpace = (spaceid, portalid)=>{
 
         if (portalid && S.portals[portalid]){
             let P = S.portals[portalid];
+
+            let dir = P.dir;
     
             ATON.Nav.setHomePOV(
                 new ATON.POV()
-                    .setPosition(new THREE.Vector3(P.pos[0], P.pos[1], P.pos[2]))
-                    .setTarget(new THREE.Vector3(P.pos[0]+P.dir[0], P.pos[1]+P.dir[1], P.pos[2]+P.dir[2]))
+                    .setPosition(new THREE.Vector3(
+                        P.pos[0] + (dir[0]*2),
+                        P.pos[1] + (dir[1]*2),
+                        P.pos[2] + (dir[2]*2)
+                    ))
+                    .setTarget(new THREE.Vector3(
+                        P.pos[0] + (dir[0]*10), 
+                        P.pos[1] + (dir[1]*10),
+                        P.pos[2] + (dir[2]*10)
+                    ))
+                    .setFOV(APP.STD_FOV)
             );
     
             console.log(portalid);
@@ -262,7 +286,7 @@ APP.loadSpace = (spaceid, portalid)=>{
         // Collab
         ATON.Photon.connect("metamic-"+spaceid);
 
-        ATON.fireEvent("APP_SpaceEnter",spaceid);
+        ATON.fire("APP_SpaceEnter",spaceid);
     });
 
 };
@@ -275,23 +299,28 @@ APP.realizePortals = ()=>{
         let dd = S.portals[p];
 
         let pos = new THREE.Vector3(dd.pos[0],dd.pos[1],dd.pos[2]);
-        let dir = new THREE.Vector3(dd.dir[0],dd.dir[1],dd.dir[2]);
+        let dir = new THREE.Vector3(-dd.dir[0],-dd.dir[1],-dd.dir[2]);
 
-        let dsp = APP.confdata.spaces[dd.dst];
+        // Check for destination space
+        let dsp = APP.confdata.spaces[dd.dstspace];
 
-        let P = new Portal(p);
-        P.realize();
-
-        P.setDestinationSpace(dd.dst);
-        P.setTitle(dd.title);
-        P.setPosition(pos).attachTo(APP.gPortals);
-        P.setEnterDirection(dir);
-
-        P.setView(ATON.PATH_RESTAPI+"cover/" + dsp.sid);
-
-        APP._portals[p] = P;
-
-        console.log(dd);
+        if (dsp){
+            let P = new Portal(p);
+            P.realize();
+    
+            P.setDestinationSpace(dd.dstspace);
+            if (dd.dstportal) P.setDestinationPortal(dd.dstportal);
+    
+            P.setTitle(dd.title);
+            P.setPosition(pos).attachTo(APP.gPortals);
+            P.setEnterDirection(dir);
+    
+            P.setView(ATON.PATH_RESTAPI2+"scenes/"+dsp.sid+"/cover");
+    
+            APP._portals[p] = P;
+    
+            console.log(dd);
+        }
     }
 };
 
@@ -300,11 +329,27 @@ APP.clearPortals = ()=>{
     APP._portals = {};
 };
 
+APP.clearTotems = ()=>{
+    for (let s in APP._totems){
+        let S = APP._totems[s];
+
+        S.clear();
+        
+        S.removeChildren();
+        delete APP._totems[s];
+    }
+
+    APP._totems = {};
+};
+
+
 // Plane utility
-APP.createPlane = (xsize, zsize, material)=>{
+APP.createPlane = (xsize, zsize, material, type)=>{
+    if (!type) type = ATON.NTYPES.SCENE;
+
     let g = new THREE.PlaneGeometry( xsize, zsize );
 
-    let N = ATON.createSceneNode().rotateX(-Math.PI * 0.5);
+    let N = new ATON.Node(undefined,type).rotateX(-Math.PI * 0.5);
     N.add( new THREE.Mesh(g, material) ); // ATON.MatHub.materials.fullyTransparent
 
     return N;
@@ -350,23 +395,23 @@ APP.createDrawingMesh = (path, sx,sy)=>{
 // Intro Space
 //========================================================
 APP.realizeIntroSpace = ()=>{
+/*
     let G = APP.createPlane(20,20, APP.MATS.introGround);
     G.enablePicking().attachToRoot();
-
     ATON._bqScene = true;
-
+*/
     const totems = APP.confdata.spaces.intro.totems;
     if (!totems) return;
 
     for (let s in totems){
         const S = totems[s];
 
-        APP._totems[S.dst] = new Totem(S.dst);
-        APP._totems[S.dst].addDrawings(S.drawings);
-        APP._totems[S.dst].setPosition(S.pos[0], 0.0, S.pos[1]);
-        APP._totems[S.dst].realize();
+        APP._totems[S.dstspace] = new Totem(S.dstspace);
+        APP._totems[S.dstspace].addDrawings(S.drawings);
+        APP._totems[S.dstspace].setPosition(S.pos[0], 0.0, S.pos[1]);
+        APP._totems[S.dstspace].realize();
 
-        APP._totems[S.dst].attachToRoot();
+        APP._totems[S.dstspace].attachToRoot();
     }
 
     ATON.Utils.loadTexture(APP.pathResAssets+ "cshadow.jpg", (tex)=>{
@@ -436,11 +481,21 @@ APP.handleTotems = ()=>{
     }
 };
 
+APP.handlePortals = ()=>{
+    if (APP._currSpaceID === "intro") return;
+
+    for (let p in APP._portals){
+        const P = APP._portals[p];
+        P.update();
+    }
+};
+
 APP.update = ()=>{
     APP.handleLayerAnimation();
     if (APP._CSM) APP._CSM.update();
 
     APP.handleTotems();
+    APP.handlePortals();
 };
 
 

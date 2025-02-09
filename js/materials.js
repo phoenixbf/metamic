@@ -45,6 +45,31 @@ MATS.init = ()=>{
         forceSinglePass: true,
     });
 
+    MATS.maquetteHover = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(0.3,0.3,0.3), //new THREE.Color("#dcc39f"),
+
+        roughness: 0.3,
+        metalness: 0,
+        transmission: 0.7,
+        ior: 1.3,
+        thickness: 2.0,
+
+        //transparent: true,
+        //depthWrite: false,
+        //opacity: 0.6,
+		//blending: THREE.MultiplyBlending
+        //forceSinglePass: true,
+    });
+
+    MATS.halo = new THREE.MeshBasicMaterial({
+        color: ATON.MatHub.colors.white,
+        map: ATON.Utils.loadTexture( APP.pathResAssets + "halo.jpg" ),
+        transparent: true,
+        depthWrite: false,
+        opacity: 0.5,
+		blending: THREE.AdditiveBlending
+    }); 
+
 /*
     MATS.maquetteproj = new THREE.MeshPhysicalMaterial({
         color: ATON.MatHub.colors.black,
