@@ -28,6 +28,7 @@ APP.STD_FOV = 70.0;
 // Setup
 //========================================================
 APP.setup = ()=>{
+    APP._bSupportXR = false;
 
     APP._mode = APP.MODE_INSPECTION;
     
@@ -144,6 +145,12 @@ APP.resetLayers = ()=>{
 // Events
 //========================================================
 APP.setupEvents = ()=>{
+    ATON.on("XR_support", d => {
+        if (ATON.device.xrSupported['immersive-vr'] || ATON.device.xrSupported['immersive-ar']){
+            APP._bSupportXR = true;
+        }
+    });
+
     ATON.on("APP_ConfigLoaded", ()=>{
         let space  = APP.params.get("s");
         let portal = APP.params.get("p");
@@ -304,6 +311,10 @@ APP.loadSpace = (spaceid, portalid)=>{
         ATON.Photon.connect("metamic-"+spaceid);
 
         ATON.Nav.requestHomePOV(0.1);
+
+        if (APP._bSupportXR){
+            ATON.FX.reset();
+        }
 
         ATON.fire("APP_SpaceEnter",spaceid);
     });
