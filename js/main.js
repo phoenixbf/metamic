@@ -225,7 +225,7 @@ APP.setupEvents = ()=>{
 
     // VR controllers
     ATON.on("XRselectStart", (c)=>{
-        if (c === XR.HAND_L) APP.requestNextLayerAnimation();
+        if (c === ATON.XR.HAND_L) APP.requestNextLayerAnimation();
     });
 
     // Keyb
@@ -463,6 +463,7 @@ APP.requestLayerAnimation = (layerid)=>{
 };
 
 APP.requestNextLayerAnimation = ()=>{
+    if (!APP._layers) return;
     if (APP._currLayer >= APP._layers.length) return;
 
     APP._currLayer += 1;
