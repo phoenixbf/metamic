@@ -69,7 +69,7 @@ APP.setup = ()=>{
 
 APP.setupUI = ()=>{
     ATON.UI.get("toolbar").append(
-        //ATON.UI.createButtonBack(),
+        ATON.UI.createButtonHome(),
         ATON.UI.createButtonVR(),
         ATON.UI.createButtonAR(),
         ATON.UI.createButtonDeviceOrientation()

@@ -100,8 +100,8 @@ MATS.init = ()=>{
             uniform float opacity;
 
 		    void main(){
-                float t = cos((vPositionW.y * 5.0) - (time * 0.8));
-                //t = (t*100.0) - 95.0;
+                float t = cos((vPositionW.y * 5.0) - (time * 1.1));
+                t = (t*1000.0) - 999.0;
                 t = clamp(t, 0.0,1.0);
 
                 vec4 frag = vec4(1,1,1, opacity);
@@ -119,8 +119,9 @@ MATS.init = ()=>{
 
 		        frag.a = mix(opacity, 1.0, f);
                 frag.a = mix(0.1,frag.a, h);
+                //frag.a = mix(frag.a,0.1, h);
 
-                //frag.rgb = mix(frag.rgb, vec3(0,0,0), t); // * (1.0-f));
+                frag.rgb = mix(frag.rgb, vec3(0,0,0), t); // * (1.0-f));
 
                 gl_FragColor = frag;
 		    }

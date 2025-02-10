@@ -97,7 +97,7 @@ realize(){
 
     this.maquette.load(APP.pathResAssets+"maquettes/"+this._spaceid+".glb", ()=>{
         this.maquette.autoFit(new THREE.Vector3(0,0,0), 0.6);
-        this.maquette.setPosition(0,1.05,0);
+        this.maquette.setPosition(0,1.0,0);
         this.maquette.setMaterial( APP.MATS.maquette );
         
         //this.maquette.renderOrder = 10;
