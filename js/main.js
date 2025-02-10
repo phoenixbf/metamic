@@ -223,6 +223,11 @@ APP.setupEvents = ()=>{
         for (let t in APP._totems) APP._totems[t].switchOn();
     });
 
+    // VR controllers
+    ATON.on("XRselectStart", (c)=>{
+        if (c === XR.HAND_L) APP.requestNextLayerAnimation();
+    });
+
     // Keyb
 	ATON.on("KeyPress", k =>{
 		if (k==='u'){
@@ -254,11 +259,13 @@ APP.loadSpace = (spaceid, portalid)=>{
     let S = APP.confdata.spaces[spaceid];
     if (!S) return;
 
+    // Clean previous scene
+    if (APP._currSpaceID){
+        ATON.SceneHub.clear();
+    }
 
-    ATON.SceneHub.clear();
     APP.clearPortals();
     APP.clearTotems();
-
 
     ATON.SUI.showSelector(false);
 
@@ -296,7 +303,7 @@ APP.loadSpace = (spaceid, portalid)=>{
         // Collab
         ATON.Photon.connect("metamic-"+spaceid);
 
-        ATON.Nav.requestHomePOV();
+        ATON.Nav.requestHomePOV(0.1);
 
         ATON.fire("APP_SpaceEnter",spaceid);
     });
