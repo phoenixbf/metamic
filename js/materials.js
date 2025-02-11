@@ -129,8 +129,10 @@ MATS.init = ()=>{
         transparent: true,
         depthWrite: false,
         //side: THREE.DoubleSide
-    }); 
+    });
 
+    MATS.AI = ATON.MatHub.materials.defUI.clone();
+    MATS.AI.uniforms.opacity.value = 0.2;
 };
 
 export default MATS;

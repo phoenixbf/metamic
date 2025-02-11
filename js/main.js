@@ -307,6 +307,12 @@ APP.loadSpace = (spaceid, portalid)=>{
             console.log(portalid);
         }
 
+        // AI layers
+        let nodes = ATON.SceneHub.currData.scenegraph.nodes;
+        for (let n in nodes){
+            if (n.startsWith("AI-")) ATON.getSceneNode(n).setMaterial(APP.MATS.AI);
+        }
+
         // Collab
         ATON.Photon.connect("metamic-"+spaceid);
 
