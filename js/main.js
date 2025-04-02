@@ -534,9 +534,3 @@ APP.update = ()=>{
     APP.handleTotems();
     APP.handlePortals();
 };
-
-
-// Run the App
-window.addEventListener('load', ()=>{
-	APP.run();
-});
