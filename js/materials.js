@@ -1,6 +1,11 @@
 let MATS = {};
 
+MATS.Colors = {};
+
 MATS.init = ()=>{
+    MATS.Colors.logo = new THREE.Color("#CA0005");
+    MATS.Colors.main = new THREE.Color("#decdaf");
+
     MATS.introStand = new THREE.MeshStandardMaterial();
     MATS.introStand.color = new THREE.Color(0.1,0.1,0.1);
 
@@ -61,14 +66,29 @@ MATS.init = ()=>{
         //forceSinglePass: true,
     });
 
+    let texHalo = ATON.Utils.loadTexture( APP.pathResAssets + "halo.jpg" );
+
     MATS.halo = new THREE.MeshBasicMaterial({
         color: ATON.MatHub.colors.white,
-        map: ATON.Utils.loadTexture( APP.pathResAssets + "halo.jpg" ),
+        map: texHalo,
         transparent: true,
         depthWrite: false,
         opacity: 0.5,
 		blending: THREE.AdditiveBlending
-    }); 
+    });
+
+    MATS.haloSprite = new THREE.SpriteMaterial({
+        color: MATS.Colors.main,
+        map: texHalo,
+        transparent: true,
+
+        depthWrite: false,
+        depthTest: false,
+        
+        opacity: 0.5,
+		
+        blending: THREE.AdditiveBlending    
+    });
 
 /*
     MATS.maquetteproj = new THREE.MeshPhysicalMaterial({
@@ -133,6 +153,18 @@ MATS.init = ()=>{
 
     MATS.AI = ATON.MatHub.materials.defUI.clone();
     MATS.AI.uniforms.opacity.value = 0.2;
+
+    // Point-clouds override material
+    ATON.MatHub.materials.point.size = 4.0;
+    
+/*
+    ATON.MatHub.materials.point.size = 0.02;
+    ATON.MatHub.materials.point.sizeAttenuation = true;
+
+    ATON.MatHub.materials.point.transparent = true;
+    ATON.MatHub.materials.point.alphaTest   = 0.0;
+    ATON.MatHub.materials.point.depthWrite  = false;
+*/
 };
 
 export default MATS;

@@ -90,6 +90,16 @@ realize(){
 
     this.add(this.spotRay);
 
+    // Halo
+    this.haloEnter = new THREE.Sprite( APP.MATS.haloSprite );
+    this.haloEnter.renderOrder = 10;
+    this.haloEnter.raycast = ATON.Utils.VOID_CAST;
+    this.haloEnter.position.y = 1.2;
+    this.haloEnter.scale.setScalar(2.0);
+    this.haloEnter.visible = false;
+
+    this.add(this.haloEnter);
+
 
     // Maquette
     this.maquette = ATON.createSceneNode();
@@ -101,6 +111,8 @@ realize(){
         this.maquette.setMaterial( APP.MATS.maquette );
         
         //this.maquette.renderOrder = 10;
+
+        //this.haloEnter.position.y = this.maquette ...
 
         this._mqScale = this.maquette.scale.y;
         //this.maquette.scale.y = this._mqScale * 0.01;
@@ -127,6 +139,8 @@ realize(){
 
     this.trigger.onHover = ()=>{
         if (!this._bProxUser) return;
+
+        this.haloEnter.visible = true;
         
         //if (this._mqScale && this.maquette) this.maquette.setScale(this._mqScale*1.1);
         //this.maquette.setMaterial(APP.MATS.introStand);
@@ -134,6 +148,8 @@ realize(){
     };
     this.trigger.onLeave = ()=>{
         if (!this._bProxUser) return;
+
+        this.haloEnter.visible = false;
         
         //if (this._mqScale && this.maquette) this.maquette.setScale(this._mqScale);
         //this.maquette.setMaterial(APP.MATS.maquette);

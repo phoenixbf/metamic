@@ -66,6 +66,8 @@ APP.setup = ()=>{
 		// Do stuff
 		console.log("All flares ready");
 	});
+
+    ATON.MRes.setBaseTSE(200.0);
 };
 
 APP.setupUI = ()=>{
@@ -281,6 +283,21 @@ APP.loadSpace = (spaceid, portalid)=>{
 
     APP.loadScene( sid, ()=>{
         APP._currSpaceID = spaceid;
+
+        if (APP._currSpaceID==="intro"){
+            ATON.Nav.locomotionValidator = ()=>{
+                if (ATON._queryDataScene === undefined){
+                    ATON.Nav._bValidLocomotion = false;
+                    return;
+                }
+
+                let qs = ATON._queryDataScene;
+                let P = qs.p;
+
+                if (P.y > 0.1 || P.y < -0.1) ATON.Nav._bValidLocomotion = false;
+                else ATON.Nav._bValidLocomotion = true;
+            };
+        }
 
         APP._layers = S.modules;
 
