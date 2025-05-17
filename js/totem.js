@@ -18,6 +18,16 @@ constructor(spaceid){
     this._label = undefined;
 }
 
+setTitle(str){
+    if (!this._label){
+        this._label = new ATON.SUI.Label(undefined, 0.3);
+        this._label.setPosition(0,0.9,0.51).setScale(2);
+        this._label.attachTo(this);
+    }
+
+    this._label.setText(str);
+}
+
 addDrawings(list){
     if (!list || list.length<1) return;
 
@@ -62,7 +72,6 @@ realize(){
     G.setPosition(0,-0.49,0);
     G.attachTo(base);
     G.disablePicking();
-
 
     // Light
     this.spotL = new THREE.SpotLight( 0xffffff );

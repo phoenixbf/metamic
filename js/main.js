@@ -462,6 +462,7 @@ APP.realizeIntroSpace = ()=>{
         APP._totems[S.dstspace] = new Totem(S.dstspace);
         APP._totems[S.dstspace].addDrawings(S.drawings);
         APP._totems[S.dstspace].setPosition(S.pos[0], 0.0, S.pos[1]);
+        APP._totems[S.dstspace].setTitle(S.label);
         APP._totems[S.dstspace].realize();
 
         APP._totems[S.dstspace].attachToRoot();

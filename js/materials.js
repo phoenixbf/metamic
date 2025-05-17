@@ -156,11 +156,18 @@ MATS.init = ()=>{
 
     // Point-clouds override material
     ATON.MatHub.materials.point.size = 4.0;
-    
 /*
-    ATON.MatHub.materials.point.size = 0.02;
-    ATON.MatHub.materials.point.sizeAttenuation = true;
+    ATON.MatHub.materials.point.depthWrite = false;
+    ATON.MatHub.materials.point.blending   = THREE.MultiplyBlending;
+    ATON.MatHub.materials.point.transparent = true;
+    ATON.MatHub.materials.point.opacity   = 0.2;
+    ATON.MatHub.materials.point.alphaTest = 0.0;
+*/
+    
 
+    //ATON.MatHub.materials.point.size = 0.02;
+    //ATON.MatHub.materials.point.sizeAttenuation = true;
+/*
     ATON.MatHub.materials.point.transparent = true;
     ATON.MatHub.materials.point.alphaTest   = 0.0;
     ATON.MatHub.materials.point.depthWrite  = false;
