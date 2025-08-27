@@ -23,7 +23,8 @@ MATS.init = ()=>{
         //transparent: true,
         depthWrite: false,
         //opacity: 0.2,
-		blending: THREE.MultiplyBlending
+		blending: THREE.MultiplyBlending,
+        premultipliedAlpha: true
     });
 
     MATS.introSpotRay = new THREE.MeshBasicMaterial({
