@@ -6,12 +6,15 @@ import Portal from "./portal.js";
 import MATS from "./materials.js";
 import Totem from "./totem.js";
 
+import Logic from "../logic/spaces.js";
+
 let APP = ATON.App.realize();
 //APP.requireFlares(["myFlare"]);
 window.APP = APP;
 
 APP.MATS  = MATS;
 APP.Totem = Totem;
+APP.Logic = Logic;
 
 APP.pathConfigFile   = APP.basePath + "config.json";
 APP.pathResAssets    = APP.basePath + "assets/";
@@ -36,6 +39,8 @@ APP.setup = ()=>{
     APP._layers = [];
     APP._currLayer = 0;
 
+    APP._bDirtyResetLayers = true;
+
     // Totems (intro)
     APP._totems = {};
     APP._currTotem = undefined;
@@ -53,6 +58,15 @@ APP.setup = ()=>{
     APP.gPortals = ATON.createUINode();
     APP.gPortals.attachToRoot();
 
+    APP.gRef = ATON.createSceneNode().load(APP.pathResAssets+"ref-man.glb", ()=>{
+        APP.gRef.traverse(o => {
+            o.raycast = ATON.Utils.VOID_CAST;
+        });
+    });
+    APP.gRef.setMaterial(APP.MATS.ref);
+    APP.gRef.attachToRoot();
+    APP.gRef.hide();
+
     //ATON._mainRoot.background = ATON.MatHub.colors.white;
     //ATON._mainRoot.fog = new THREE.FogExp2( new THREE.Color( 0.9,0.9,0.9 ), 0.01 );
     //ATON._renderer.shadowMap.enabled = true;
@@ -66,8 +80,6 @@ APP.setup = ()=>{
 		// Do stuff
 		console.log("All flares ready");
 	});
-
-    ATON.MRes.setBaseTSE(200.0);
 };
 
 APP.setupUI = ()=>{
@@ -157,7 +169,9 @@ APP.setupEvents = ()=>{
         let space  = APP.params.get("s");
         let portal = APP.params.get("p");
 
-        if (space) APP.loadSpace(space, portal);
+        if (!space) space = "intro";
+
+        APP.loadSpace(space, portal);
     });
 
     ATON.on("AllNodeRequestsCompleted", ()=>{
@@ -192,7 +206,8 @@ APP.setupEvents = ()=>{
             }
         });
 */
-        APP.resetLayers();
+        if (APP._bDirtyResetLayers) APP.resetLayers();
+        APP._bDirtyResetLayers = false;
     });
     
     ATON.on("APP_SpaceEnter", (spaceid)=>{
@@ -202,6 +217,7 @@ APP.setupEvents = ()=>{
         else APP.realizePortals();
     
         //ATON.Photon.connect();
+        APP._bDirtyResetLayers = true;
     });
 
     ATON.on("APP_PortalEnterRequest", d => {
@@ -239,6 +255,10 @@ APP.setupEvents = ()=>{
 
     // Keyb
 	ATON.on("KeyPress", k =>{
+        if (k === ' ' || k === 'Space'){
+            ATON.MediaFlow.startAudioStreaming();
+        }
+
 		if (k==='u'){
             ATON.updateLightProbes();
 		}
@@ -257,6 +277,11 @@ APP.setupEvents = ()=>{
             else APP._P.constant = p.y;
 
             ATON.updateLightProbes();
+        }
+    });
+    ATON.on("KeyUp",(k)=>{
+        if (k === ' ' || k === 'Space'){
+            ATON.MediaFlow.stopAudioStreaming();
         }
     });
 };
@@ -280,6 +305,12 @@ APP.loadSpace = (spaceid, portalid)=>{
 
     let sid = S.sid;
     if (!sid) return;
+
+    // reference
+    if (S.ref){
+        if (S.ref.pos) APP.gRef.setPosition(S.ref.pos[0],S.ref.pos[1],S.ref.pos[2]);
+        APP.gRef.show();
+    }
 
     APP.loadScene( sid, ()=>{
         APP._currSpaceID = spaceid;
@@ -335,9 +366,13 @@ APP.loadSpace = (spaceid, portalid)=>{
 
         ATON.Nav.requestHomePOV(0.1);
 
+/*
         if (APP._bSupportXR){
             ATON.FX.reset();
         }
+*/
+        // Setup custom Logic for this space if present
+        if (APP.Logic[spaceid]) APP.Logic[spaceid]();
 
         ATON.fire("APP_SpaceEnter",spaceid);
     });
@@ -462,7 +497,10 @@ APP.realizeIntroSpace = ()=>{
         APP._totems[S.dstspace] = new Totem(S.dstspace);
         APP._totems[S.dstspace].addDrawings(S.drawings);
         APP._totems[S.dstspace].setPosition(S.pos[0], 0.0, S.pos[1]);
+        APP._totems[S.dstspace].orientToLocation(0,0,0);
+
         APP._totems[S.dstspace].setTitle(S.label);
+
         APP._totems[S.dstspace].realize();
 
         APP._totems[S.dstspace].attachToRoot();

@@ -181,6 +181,8 @@ realize(){
 
     this._suiDraw = ATON.createUINode(this._spaceid+"-drawings");
     this._suiDraw.setPosition( this.position );
+    //this._suiDraw.setRotation( this.rotation );
+    this._suiDraw.orientToLocation(0,0,0);
     this._suiDraw.attachToRoot();
 
     const hn = numDrawings*0.5;
@@ -245,6 +247,7 @@ update(){
     if (this._suiDraw){
         this._suiDraw.visible = true;
         if (t <= 1.0) this._suiDraw.setScale(t + 0.001);
+        
         //this._suiDraw.orientToCamera();
     }
 
