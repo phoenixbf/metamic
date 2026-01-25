@@ -82,14 +82,29 @@ APP.setup = ()=>{
 	});
 };
 
+/*
+    UI
+===================================*/
 APP.setupUI = ()=>{
     ATON.UI.get("toolbar").append(
         ATON.UI.createButtonHome(),
         ATON.UI.createButtonVR(),
-        ATON.UI.createButtonAR(),
         ATON.UI.createButtonDeviceOrientation()
     );
 };
+
+// Semantics
+APP.showSemanticPanel = (title, elContent)=>{
+    ATON.UI.showSidePanel({
+        header: title,
+        body: elContent
+    });
+};
+
+APP.closeSemanticPanel = ()=>{
+    ATON.UI.hideSidePanel();
+};
+
 
 APP.setMode = (m)=>{
     APP._mode = m;

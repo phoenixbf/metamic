@@ -163,7 +163,7 @@ MATS.init = ()=>{
         
         //alphaHash: true,
         
-        side: THREE.DoubleSide
+        //side: THREE.DoubleSide
 
         //emissive: ATON.MatHub.colors.white,
         //emissiveIntensity: 5.0
