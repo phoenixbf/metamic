@@ -180,7 +180,9 @@ realize(){
     const numDrawings = this._drawings.length;
 
     this._suiDraw = ATON.createUINode(this._spaceid+"-drawings");
-    this._suiDraw.setPosition( this.position );
+    this._suiDraw.setPosition( this.position )
+    this._suiDraw.setScale(2);
+
     //this._suiDraw.setRotation( this.rotation );
     this._suiDraw.orientToLocation(0,0,0);
     this._suiDraw.attachToRoot();
@@ -196,7 +198,7 @@ realize(){
         let D = ATON.createUINode(this._spaceid+"-drawing"+d);
         D.add(dM);
 
-        D.setPosition(((d + 0.5) - hn)*1.1, 2.0, -1.2);
+        D.setPosition(((d + 0.5) - hn)*1.1, 1.0, -1.2);
         //D.orientToLocation(0,1.5,0);
 
         D.attachTo(this._suiDraw);
@@ -222,6 +224,7 @@ update(){
         if (this._suiDraw){
             this._suiDraw.setScale(0.001);
             this._suiDraw.visible = false;
+            this.spotRay.visible = true;
         }
 /*
         if (this._suiDraw){
@@ -246,7 +249,9 @@ update(){
 
     if (this._suiDraw){
         this._suiDraw.visible = true;
-        if (t <= 1.0) this._suiDraw.setScale(t + 0.001);
+        this.spotRay.visible  = false;
+        
+        if (t <= 1.0) this._suiDraw.setScale((t*2.0) + 0.001);
         
         //this._suiDraw.orientToCamera();
     }

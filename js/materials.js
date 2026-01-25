@@ -130,9 +130,16 @@ MATS.init = ()=>{
 
 		    void main(){
 
+                float t = cos((vPositionW.y * 5.0) - (time * 1.1));
+                t = (t*1000.0) - 999.0;
+                t = clamp(t, 0.0,1.0);
+
                 float f;
 		        //f = dot(vNormalV, viewDirectionW);
-                f = dot(vec3(vNormalV.x,vNormalV.y,vNormalV.z), vec3(0,0,1));
+                
+                f = dot(vNormalV, vec3(0,0,1));
+                
+                //f = dot(vNormalW, vec3(0,0,-1));
 		        
                 f = clamp(1.0-f, 0.0, 1.0);
                 f *= f;
@@ -142,13 +149,11 @@ MATS.init = ()=>{
                 s *= cos(vPositionW.z * 50.0);
 
                 f = clamp(f, 0.0,1.0);
-                //if (f < 0.5) discard;
+                //if (f < 0.7) discard;
 
-                vec4 frag = mix(vec4(tint, s),vec4(0,0,0,0.7), f);
+                vec4 frag = mix(vec4(tint, 0.1),vec4(0,0,0,0.7), f);
 
-                float t = cos((vPositionW.y * 5.0) - (time * 1.1));
-                t = (t*1000.0) - 999.0;
-                t = clamp(t, 0.0,1.0);
+
 
                 gl_FragColor = frag;
 		    }
@@ -156,7 +161,9 @@ MATS.init = ()=>{
         transparent: true,
         depthWrite: false,
         
-        //side: THREE.DoubleSide
+        //alphaHash: true,
+        
+        side: THREE.DoubleSide
 
         //emissive: ATON.MatHub.colors.white,
         //emissiveIntensity: 5.0
