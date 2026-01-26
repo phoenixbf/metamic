@@ -510,18 +510,29 @@ APP.realizeIntroSpace = ()=>{
     const totems = APP.confdata.spaces.intro.totems;
     if (!totems) return;
 
+    let numTotems = totems.length;
+    let rad = 5.0;
+
     for (let s in totems){
         const S = totems[s];
 
         APP._totems[S.dstspace] = new Totem(S.dstspace);
         APP._totems[S.dstspace].addDrawings(S.drawings);
-        APP._totems[S.dstspace].setPosition(S.pos[0], 0.0, S.pos[1]);
+        APP._totems[S.dstspace].setTitle(S.label);
+        
+        //APP._totems[S.dstspace].setPosition(S.pos[0], 0.0, S.pos[1]);
+
+        let c = (parseInt(s)/numTotems) * Math.PI;
+
+        APP._totems[S.dstspace].setPosition(
+            -Math.cos(c) * rad,
+            0.0,
+            -Math.sin(c) * rad,
+        );
+
         APP._totems[S.dstspace].orientToLocation(0,0,0);
 
-        APP._totems[S.dstspace].setTitle(S.label);
-
         APP._totems[S.dstspace].realize();
-
         APP._totems[S.dstspace].attachToRoot();
     }
 

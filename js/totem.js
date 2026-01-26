@@ -20,12 +20,13 @@ constructor(spaceid){
 
 setTitle(str){
     if (!this._label){
-        this._label = new ATON.SUI.Label(undefined, 0.3);
+        this._label = new ATON.SUI.Label(undefined, 0.4);
         this._label.setPosition(0,0.9,0.51).setScale(2);
         this._label.attachTo(this);
     }
 
     this._label.setText(str);
+    this._label.setTextColor(APP.MATS.Colors.main);
 }
 
 addDrawings(list){
