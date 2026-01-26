@@ -104,7 +104,7 @@ realize(){
     this.haloEnter.renderOrder = 10;
     this.haloEnter.raycast = ATON.Utils.VOID_CAST;
     this.haloEnter.position.y = 1.2;
-    this.haloEnter.scale.setScalar(2.0);
+    this.haloEnter.scale.setScalar(1.5);
     this.haloEnter.visible = false;
 
     this.add(this.haloEnter);
@@ -140,9 +140,11 @@ realize(){
     });
 
     // Trigger
+    let trsize = 0.8;
     this.trigger = ATON.createUINode("trigger-"+this._spaceid);
     this.trigger.add( new THREE.Mesh(ATON.Utils.geomUnitCube, ATON.MatHub.materials.fullyTransparent) );
-    this.trigger.setPosition(this.position.x, 1.5, this.position.z);
+    this.trigger.setPosition(this.position.x, 1.5*trsize, this.position.z);
+    this.trigger.setScale(trsize);
     //this.trigger.setRotation(this.rotation);
     this.trigger.enablePicking();
 
@@ -150,6 +152,8 @@ realize(){
         if (!this._bProxUser) return;
 
         this.haloEnter.visible = true;
+
+        ATON.AudioHub.playOnceGlobally(APP.pathResAudio+"blop.mp3");
         
         //if (this._mqScale && this.maquette) this.maquette.setScale(this._mqScale*1.1);
         //this.maquette.setMaterial(APP.MATS.introStand);
@@ -198,8 +202,8 @@ realize(){
         let D = ATON.createUINode(this._spaceid+"-drawing"+d);
         D.add(dM);
 
-        D.setPosition(((d + 0.5) - hn)*1.1, 1.0, -1.2);
-        //D.orientToLocation(0,1.5,0);
+        D.setPosition(((d + 0.5) - hn)*1.1, 1.5, -1.2);
+        //D.orientToLocation(0,1.2,0);
 
         D.attachTo(this._suiDraw);
     }

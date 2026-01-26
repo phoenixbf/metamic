@@ -109,7 +109,7 @@ MATS.init = ()=>{
         depthWrite: false,
         depthTest: false,
         
-        opacity: 0.5,
+        opacity: 0.7,
 		
         blending: THREE.AdditiveBlending    
     });

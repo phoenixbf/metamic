@@ -26,4 +26,29 @@
 
     -webkit-backdrop-filter: blur(var(--aton-blur-radius));
     backdrop-filter: blur(var(--aton-blur-radius));
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.metamic-bottom-toolbar {
+    display: inline-block;
+    margin: 4px;
+
+    pointer-events: initial;
+    
+    background-color: rgba(var(--bs-body-bg-rgb), 0.3) !important;
+    border-radius: var(--bs-border-radius);
+
+    -webkit-backdrop-filter: blur(var(--aton-blur-radius));
+    backdrop-filter: blur(var(--aton-blur-radius));
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }

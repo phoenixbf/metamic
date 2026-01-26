@@ -18,6 +18,7 @@ APP.Logic = Logic;
 
 APP.pathConfigFile   = APP.basePath + "config.json";
 APP.pathResAssets    = APP.basePath + "assets/";
+APP.pathResAudio     = APP.pathResAssets + "audio/";
 
 APP.confdata = undefined;
 APP.PATH_DRAWINGS = undefined;
@@ -87,9 +88,12 @@ APP.setup = ()=>{
 ===================================*/
 APP.setupUI = ()=>{
     ATON.UI.get("toolbar").append(
-        ATON.UI.createButtonHome(),
         ATON.UI.createButtonVR(),
         ATON.UI.createButtonDeviceOrientation()
+    );
+
+    ATON.UI.get("toolbar-bottom").append(
+        ATON.UI.createButtonHome()
     );
 };
 
