@@ -1,3 +1,13 @@
+:root {
+/*
+    --aton-colors-accent: #ff7d57;
+    --aton-colors-accent-rgb: 255,125,87;
+*/
+
+    --aton-colors-accent: #decdaf;
+    --aton-colors-accent-rgb: 222,205,175;
+}
+
 .metamic-logo {
     bottom: 0px;
     right: 0px;
@@ -51,4 +61,18 @@
     -webkit-user-select: none;
     -o-user-select: none;
     user-select: none;
+}
+
+.metamic-user-toolbar {
+    top: 0px;
+    right: 0px;
+    position: absolute;
+
+    margin: 4px;
+
+    background-color: rgba(var(--bs-body-bg-rgb), 0.5) !important;
+    border-radius: var(--bs-border-radius);
+
+    -webkit-backdrop-filter: blur(var(--aton-blur-radius));
+    backdrop-filter: blur(var(--aton-blur-radius));
 }

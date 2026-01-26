@@ -18,6 +18,7 @@ APP.Logic = Logic;
 
 APP.pathConfigFile   = APP.basePath + "config.json";
 APP.pathResAssets    = APP.basePath + "assets/";
+APP.pathResIcons     = APP.pathResAssets + "icons/";
 APP.pathResAudio     = APP.pathResAssets + "audio/";
 
 APP.confdata = undefined;
@@ -88,8 +89,15 @@ APP.setup = ()=>{
 ===================================*/
 APP.setupUI = ()=>{
     ATON.UI.get("toolbar").append(
+        ATON.UI.createButtonFullscreen(),
         ATON.UI.createButtonVR(),
         ATON.UI.createButtonDeviceOrientation()
+    );
+
+    ATON.UI.get("user").append(
+        ATON.UI.createButtonUser({
+            titlelogin: "MetaMic Login"
+        })
     );
 
     ATON.UI.get("toolbar-bottom").append(
@@ -167,8 +175,9 @@ APP.resetLayers = ()=>{
 */
         L.scale.y = 0.05;
         
-        //L.position.y = (((numlayers-i) * 0.1) / M.scale.x);
+        ///L.position.y = (((numlayers-i) * 0.1) / M.scale.x);
         L.position.y = ((i * -0.25) / M.scale.x);
+        //L.position.y = -50.0;
     }
 
     APP._currLayer = 0;
@@ -374,11 +383,39 @@ APP.loadSpace = (spaceid, portalid)=>{
             console.log(portalid);
         }
 
-        // AI layers
+        // Scene layers
         let nodes = ATON.SceneHub.currData.scenegraph.nodes;
         for (let n in nodes){
-            if (n.startsWith("AI-")) ATON.getSceneNode(n).setMaterial(APP.MATS.AI);
+            if (n.startsWith("AI-")){
+                ATON.getSceneNode(n).setMaterial(APP.MATS.AI);
+            }
+
+            if (n === "present"){
+                let elP = ATON.UI.createButton({
+                    text: "Context",
+                    icon: "bi-building-fill",
+                    classes: "aton-btn-highlight",
+                    onpress: ()=>{
+                        let P = ATON.getSceneNode("present");
+                        P.toggle();
+
+                        if (P.visible) elP.classList.add("aton-btn-highlight");
+                        else elP.classList.remove("aton-btn-highlight");
+                    }
+                })
+
+                ATON.UI.get("toolbar").append(elP);
+            }
         }
+
+        if (APP._currSpaceID !== "intro") ATON.UI.get("toolbar").prepend(
+            ATON.UI.createButton({
+                icon: APP.pathResIcons+"logo.png",
+                onpress: ()=>{
+                    window.location.href = APP.basePath + "?s=intro";
+                }
+            })
+        );
 
         // Collab
         ATON.Photon.connect("metamic-"+spaceid);
@@ -511,7 +548,7 @@ APP.realizeIntroSpace = ()=>{
     if (!totems) return;
 
     let numTotems = totems.length;
-    let rad = 5.0;
+    let rad = 6.0;
 
     for (let s in totems){
         const S = totems[s];
@@ -523,6 +560,7 @@ APP.realizeIntroSpace = ()=>{
         //APP._totems[S.dstspace].setPosition(S.pos[0], 0.0, S.pos[1]);
 
         let c = (parseInt(s)/numTotems) * Math.PI;
+        c += (Math.PI/numTotems)*0.5;
 
         APP._totems[S.dstspace].setPosition(
             -Math.cos(c) * rad,
@@ -579,8 +617,11 @@ APP.handleLayerAnimation = ()=>{
 
     APP._reqLayer.scale.y += 0.05;
     APP._reqLayer.position.y *= 0.8;
+    //APP._reqLayer.position.y += 0.2;
 
     if (APP._reqLayer.scale.y > 1.0){
+    //if (APP._reqLayer.position.y >= 0.0){
+
         APP._reqLayer.scale.x = 1.0;
         APP._reqLayer.scale.y = 1.0;
         APP._reqLayer.scale.z = 1.0;
