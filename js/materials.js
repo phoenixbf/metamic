@@ -50,6 +50,11 @@ MATS.init = ()=>{
         premultipliedAlpha: true
     });
 
+    ATON.Utils.loadTexture(APP.pathResAssets+ "cshadow.jpg", (tex)=>{
+        APP.MATS.cshadow.map = tex;
+        APP.MATS.cshadow.needsUpdate = true;
+    });
+
     MATS.introSpotRay = new THREE.MeshBasicMaterial({
         //color: ATON.MatHub.colors.black,
         //transparent: true,
@@ -58,6 +63,12 @@ MATS.init = ()=>{
         //opacity: 0.2,
 		blending: THREE.AdditiveBlending
     });
+
+    ATON.Utils.loadTexture(APP.pathResAssets+ "spotray.jpg", (tex)=>{
+        APP.MATS.introSpotRay.map = tex;
+        APP.MATS.introSpotRay.needsUpdate = true;
+    });
+
 /*
     MATS.intromaquette = ATON.MatHub.materials.controllerRay.clone();
     MATS.intromaquette.blending =THREE.AdditiveBlending;

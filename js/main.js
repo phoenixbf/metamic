@@ -571,20 +571,9 @@ APP.realizeIntroSpace = ()=>{
         APP._totems[S.dstspace].orientToLocation(0,0,0);
 
         APP._totems[S.dstspace].realize();
+        APP._totems[S.dstspace].computePOV();
         APP._totems[S.dstspace].attachToRoot();
     }
-
-    ATON.Utils.loadTexture(APP.pathResAssets+ "cshadow.jpg", (tex)=>{
-        APP.MATS.cshadow.map = tex;
-        APP.MATS.cshadow.needsUpdate = true;
-    });
-
-    ATON.Utils.loadTexture(APP.pathResAssets+ "spotray.jpg", (tex)=>{
-        APP.MATS.introSpotRay.map = tex;
-        APP.MATS.introSpotRay.needsUpdate = true;
-    });
-
-    
 
     // Lights
 /*

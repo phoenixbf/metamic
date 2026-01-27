@@ -9,8 +9,11 @@ constructor(spaceid){
 
     this._spotH = 2.5;
 
-    this._dsProximity  = 8.0;
+    this._dsProximity  = 6.0;
     this._dsActivation = 3.0;
+    this._wspos = new THREE.Vector3();
+
+    this.pov = new ATON.POV();
 
     this._bProxUser = false;
     this._tEnterProx = undefined;
@@ -56,6 +59,13 @@ clear(){
 
     if (this.trigger) delete this.trigger;
     if (this.maquette) delete this.maquette;
+}
+
+computePOV(){
+    this.sensor.getWorldPosition(this._wspos);
+
+    this.pov.setPosition(this._wspos.x, this._wspos.y + 1.5, this._wspos.z);
+    this.pov.setTarget(this.position.x, this.position.y + 1.4, this.position.z);
 }
 
 realize(){
@@ -105,10 +115,17 @@ realize(){
     this.haloEnter.renderOrder = 10;
     this.haloEnter.raycast = ATON.Utils.VOID_CAST;
     this.haloEnter.position.y = 1.2;
-    this.haloEnter.scale.setScalar(1.5);
+    this.haloEnter.scale.setScalar(1.8);
     this.haloEnter.visible = false;
 
     this.add(this.haloEnter);
+
+    // Proximity sensor
+    this.sensor = new THREE.Mesh(ATON.Utils.geomUnitCube, ATON.MatHub.materials.invisible);
+    this.sensor.raycast = ATON.Utils.VOID_CAST;
+    this.sensor.position.set(0,0,1.5);
+    this.sensor.scale.setScalar(2);
+    this.add(this.sensor);
 
 
     // Maquette
@@ -143,7 +160,7 @@ realize(){
     // Trigger
     let trsize = 0.8;
     this.trigger = ATON.createUINode("trigger-"+this._spaceid);
-    this.trigger.add( new THREE.Mesh(ATON.Utils.geomUnitCube, ATON.MatHub.materials.fullyTransparent) );
+    this.trigger.add( new THREE.Mesh(ATON.Utils.geomUnitCube, ATON.MatHub.materials.invisible) );
     this.trigger.setPosition(this.position.x, 1.5*trsize, this.position.z);
     this.trigger.setScale(trsize);
     //this.trigger.setRotation(this.rotation);
@@ -215,7 +232,9 @@ realize(){
 update(){
     let E = ATON.Nav.getCurrentEyeLocation();
 
-    let sd = E.distanceToSquared(this.position);
+    this.sensor.getWorldPosition(this._wspos);
+
+    let sd = E.distanceToSquared(this._wspos);
     if (sd > this._dsProximity){
         if (this._bProxUser){
             ATON.fire("TotemLeaveProximity", this._spaceid);
