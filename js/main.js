@@ -393,7 +393,7 @@ APP.loadSpace = (spaceid, portalid)=>{
             if (n === "present"){
                 let elP = ATON.UI.createButton({
                     text: "Context",
-                    icon: "bi-building-fill",
+                    icon: APP.pathResIcons+"context.png", //"bi-building-fill",
                     classes: "aton-btn-highlight",
                     onpress: ()=>{
                         let P = ATON.getSceneNode("present");
@@ -404,18 +404,46 @@ APP.loadSpace = (spaceid, portalid)=>{
                     }
                 })
 
-                ATON.UI.get("toolbar").append(elP);
+                ATON.UI.get("toolbar-bottom").append(elP);
             }
         }
 
-        if (APP._currSpaceID !== "intro") ATON.UI.get("toolbar").prepend(
-            ATON.UI.createButton({
-                icon: APP.pathResIcons+"logo.png",
+        if (APP._currSpaceID !== "intro"){
+            ATON.UI.get("toolbar").prepend(
+                ATON.UI.createButton({
+                    icon: APP.pathResIcons+"logo.png",
+                    onpress: ()=>{
+                        window.location.href = APP.basePath + "?s=intro";
+                    }
+                })
+            );
+
+            let elProg = ATON.UI.createButton({
+                icon: APP.pathResIcons+"recprog.png", //"bi-puzzle-fill",
                 onpress: ()=>{
-                    window.location.href = APP.basePath + "?s=intro";
+                    APP.requestNextLayerAnimation();
+
+                    if (APP._currLayer >= APP._layers.length-1){
+                        ATON.UI.showElement(elProgReset);
+                        ATON.UI.hideElement(elProg);
+                    }
                 }
-            })
-        );
+            });
+
+            let elProgReset = ATON.UI.createButton({
+                icon: APP.pathResIcons+"recprog-reset.png",
+                onpress: ()=>{
+                    APP.resetLayers();
+
+                    ATON.UI.hideElement(elProgReset);
+                    ATON.UI.showElement(elProg);
+                }
+            });
+
+            ATON.UI.hideElement(elProgReset);
+
+            ATON.UI.get("toolbar-bottom").append( elProg, elProgReset );
+        }
 
         // Collab
         ATON.Photon.connect("metamic-"+spaceid);
