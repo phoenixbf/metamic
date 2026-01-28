@@ -90,6 +90,7 @@ APP.setup = ()=>{
 APP.setupUI = ()=>{
     ATON.UI.get("toolbar").append(
         ATON.UI.createButtonFullscreen(),
+        ATON.UI.createButtonQR(),
         ATON.UI.createButtonVR(),
         ATON.UI.createButtonDeviceOrientation()
     );
