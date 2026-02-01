@@ -372,6 +372,8 @@ APP.loadSpace = (spaceid, portalid)=>{
     // reference
     if (S.ref){
         if (S.ref.pos) APP.gRef.setPosition(S.ref.pos[0],S.ref.pos[1],S.ref.pos[2]);
+        if (S.ref.scale) APP.gRef.setScale(S.ref.scale);
+        
         APP.gRef.show();
     }
 
