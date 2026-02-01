@@ -20,7 +20,7 @@
 }
 
 .metamic-logo img {
-    width: 100px;
+    width: 70px;
     height: auto;
 }
 
@@ -31,7 +31,7 @@
 
     margin: 4px;
 
-    background-color: rgba(var(--bs-body-bg-rgb), 0.5) !important;
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2) !important;
     border-radius: var(--bs-border-radius);
 
     -webkit-backdrop-filter: blur(var(--aton-blur-radius));
@@ -50,7 +50,7 @@
 
     pointer-events: initial;
     
-    background-color: rgba(var(--bs-body-bg-rgb), 0.3) !important;
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2) !important;
     border-radius: var(--bs-border-radius);
 
     -webkit-backdrop-filter: blur(var(--aton-blur-radius));
@@ -70,7 +70,7 @@
 
     margin: 4px;
 
-    background-color: rgba(var(--bs-body-bg-rgb), 0.5) !important;
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2) !important;
     border-radius: var(--bs-border-radius);
 
     -webkit-backdrop-filter: blur(var(--aton-blur-radius));
