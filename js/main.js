@@ -54,6 +54,7 @@ APP.setup = ()=>{
     APP.MATS.init();
 
     APP.setupEvents();
+    APP.setupCollabLogic();
 
     APP.loadConfig();
 
@@ -156,7 +157,7 @@ APP.setupShadows = ()=>{
     S.bias           = 0.0; //-0.0005;
 };
 
-APP.resetLayers = ()=>{
+APP.resetLayers = (bBroadcast)=>{
     if (!APP._layers) return;
 
     let numlayers = APP._layers.length;
@@ -183,6 +184,8 @@ APP.resetLayers = ()=>{
 
     APP._currLayer = 0;
     ATON.updateLightProbes();
+
+    if (bBroadcast) ATON.Photon.fire("MM_PROG_RESET");
 };
 
 // Events
@@ -279,7 +282,7 @@ APP.setupEvents = ()=>{
 
     // VR controllers
     ATON.on("XRselectStart", (c)=>{
-        if (c === ATON.XR.HAND_L) APP.requestNextLayerAnimation();
+        if (c === ATON.XR.HAND_L) APP.requestNextLayerAnimation(true);
     });
 
     // Keyb
@@ -292,10 +295,10 @@ APP.setupEvents = ()=>{
             ATON.updateLightProbes();
 		}
 		if (k==='a'){
-            APP.requestNextLayerAnimation();
+            APP.requestNextLayerAnimation(true);
 		}
         if (k==='r'){
-            APP.resetLayers();
+            APP.resetLayers(true);
         }
 
         if (k==='s'){
@@ -313,6 +316,37 @@ APP.setupEvents = ()=>{
             ATON.MediaFlow.stopAudioStreaming();
         }
     });
+};
+
+// Collab logic
+//========================================================
+APP.setupCollabLogic = ()=>{
+    ATON.on("VRC_IDassigned", uid =>{
+        ATON.Photon.fire("MM_REQ_SPACE_STATE");
+    });
+
+    ATON.Photon.on("MM_PROG", (o)=>{
+        if (!o.layer) return;
+
+        APP.requestLayerAnimation(o.layer);
+    });
+
+    ATON.Photon.on("MM_PROG_RESET", ()=>{
+        APP.resetLayers();
+    });
+/*
+    ATON.Photon.on("MM_REQ_SPACE_STATE", ()=>{
+        let S = {};
+        S.currLayer = APP._currLayer;
+
+        ATON.Photon.fire("MM_SPACE_STATE", S);
+    });
+
+    ATON.on("MM_SPACE_STATE", (S)=>{
+        APP.requestLayerAnimation(S.currLayer);
+        console.log(S)
+    });
+*/
 };
 
 
@@ -422,7 +456,7 @@ APP.loadSpace = (spaceid, portalid)=>{
             let elProg = ATON.UI.createButton({
                 icon: APP.pathResIcons+"recprog.png", //"bi-puzzle-fill",
                 onpress: ()=>{
-                    APP.requestNextLayerAnimation();
+                    APP.requestNextLayerAnimation(true);
 
                     if (APP._currLayer >= APP._layers.length-1){
                         ATON.UI.showElement(elProgReset);
@@ -434,7 +468,7 @@ APP.loadSpace = (spaceid, portalid)=>{
             let elProgReset = ATON.UI.createButton({
                 icon: APP.pathResIcons+"recprog-reset.png",
                 onpress: ()=>{
-                    APP.resetLayers();
+                    APP.resetLayers(true);
 
                     ATON.UI.hideElement(elProgReset);
                     ATON.UI.showElement(elProg);
@@ -615,19 +649,20 @@ APP.realizeIntroSpace = ()=>{
 
 // Update
 //========================================================
-APP.requestLayerAnimation = (layerid)=>{
+APP.requestLayerAnimation = (layerid, bBroadcast)=>{
     if (APP._reqLayer !== undefined) return;
 
     APP._reqLayer = ATON.getSceneNode(layerid);
+    if (bBroadcast) ATON.Photon.fire("MM_PROG",{ layer: layerid });
 };
 
-APP.requestNextLayerAnimation = ()=>{
+APP.requestNextLayerAnimation = (bBroadcast)=>{
     if (!APP._layers) return;
     if (APP._currLayer >= APP._layers.length) return;
 
     APP._currLayer += 1;
 
-    APP.requestLayerAnimation( APP._layers[APP._currLayer] );
+    APP.requestLayerAnimation( APP._layers[APP._currLayer], bBroadcast );
 };
 
 APP.handleLayerAnimation = ()=>{
