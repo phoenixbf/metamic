@@ -41,6 +41,8 @@ APP.setup = ()=>{
     APP._layers = [];
     APP._currLayer = 0;
 
+    APP.resetCurrSpaceHypotheses();
+
     APP._bDirtyResetLayers = true;
 
     // Totems (intro)
@@ -364,6 +366,8 @@ APP.loadSpace = (spaceid, portalid)=>{
     APP.clearPortals();
     APP.clearTotems();
 
+    APP.resetCurrSpaceHypotheses();
+
     ATON.SUI.showSelector(false);
 
     let sid = S.sid;
@@ -423,8 +427,10 @@ APP.loadSpace = (spaceid, portalid)=>{
         // Scene layers
         let nodes = ATON.SceneHub.currData.scenegraph.nodes;
         for (let n in nodes){
+            let N = ATON.getSceneNode(n);
+
             if (n.startsWith("AI-")){
-                ATON.getSceneNode(n).setMaterial(APP.MATS.AI);
+                N.setMaterial(APP.MATS.AI);
             }
 
             if (n === "present"){
@@ -433,8 +439,9 @@ APP.loadSpace = (spaceid, portalid)=>{
                     icon: APP.pathResIcons+"context.png", //"bi-building-fill",
                     classes: "aton-btn-highlight",
                     onpress: ()=>{
-                        let P = ATON.getSceneNode("present");
-                        P.toggle();
+                        //let P = ATON.getSceneNode("present");
+                        //P.toggle();
+                        N.toggle();
 
                         if (P.visible) elP.classList.add("aton-btn-highlight");
                         else elP.classList.remove("aton-btn-highlight");
@@ -443,9 +450,18 @@ APP.loadSpace = (spaceid, portalid)=>{
 
                 ATON.UI.get("toolbar-bottom").append(elP);
             }
+
+            if (n.startsWith("H-")){
+
+                APP._hyNode = N;
+                console.log(APP._hyNode);
+            }
         }
 
         if (APP._currSpaceID !== "intro"){
+            
+            APP.setCurrSpaceHypothesis(0);
+
             ATON.UI.get("toolbar").prepend(
                 ATON.UI.createButton({
                     icon: APP.pathResIcons+"logo.png",
@@ -708,6 +724,22 @@ APP.handlePortals = ()=>{
         P.update();
     }
 };
+
+// Hypotheses
+APP.resetCurrSpaceHypotheses = ()=>{
+    APP._hyNode  = undefined;
+    APP._currHyp = 0;
+};
+
+APP.setCurrSpaceHypothesis = (h)=>{
+    if (!APP._hyNode) return;
+
+    for (let n in APP._hyNode.children) APP._hyNode.children[n].hide();
+    APP._hyNode.children[h].show();
+
+    APP._currHyp = h;
+};
+
 
 APP.update = ()=>{
     APP.handleLayerAnimation();
