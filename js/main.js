@@ -452,7 +452,6 @@ APP.loadSpace = (spaceid, portalid)=>{
             }
 
             if (n.startsWith("H-")){
-
                 APP._hyNode = N;
                 console.log(APP._hyNode);
             }
@@ -460,7 +459,28 @@ APP.loadSpace = (spaceid, portalid)=>{
 
         if (APP._currSpaceID !== "intro"){
             
-            APP.setCurrSpaceHypothesis(0);
+            if (APP._hyNode){
+                let hlist = [];
+
+                APP.setCurrSpaceHypothesis(0);
+
+                for (let h in APP._hyNode.children){
+                    hlist.push({title: APP._hyNode.children[h].nid, value:h });
+                }
+
+                let elHySelect = ATON.UI.createSelect({
+                    items: hlist,
+                    value: 0,
+                    title: "Hypotheses",
+                    onselect: (v)=>{
+                        APP.setCurrSpaceHypothesis(v);
+                    }
+                });
+                let elHyG = ATON.UI.createContainer({style:"max-width:400px; display:inline-block"});
+                elHyG.append(elHySelect);
+
+                ATON.UI.get("toolbar-bottom").append(elHyG);
+            }
 
             ATON.UI.get("toolbar").prepend(
                 ATON.UI.createButton({
