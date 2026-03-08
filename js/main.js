@@ -5,6 +5,7 @@
 import Portal from "./portal.js";
 import MATS from "./materials.js";
 import Totem from "./totem.js";
+import UI from "./ui.js";
 
 import Logic from "../logic/spaces.js";
 
@@ -15,6 +16,7 @@ window.APP = APP;
 APP.MATS  = MATS;
 APP.Totem = Totem;
 APP.Logic = Logic;
+APP.UI    = UI;
 
 APP.pathConfigFile   = APP.basePath + "config.json";
 APP.pathResAssets    = APP.basePath + "assets/";
@@ -28,6 +30,13 @@ APP.MODE_INSPECTION = 0;
 APP.MODE_PUZZLE     = 1;
 
 APP.STD_FOV = 70.0;
+
+APP.lang    = "en";
+
+APP.PROFILE_NONEXP = 0;
+APP.PROFILE_EXP    = 1;
+
+APP.profile = APP.PROFILE_NONEXP;
 
 
 // Setup
@@ -51,7 +60,7 @@ APP.setup = ()=>{
 
     ATON.realize();
     ATON.UI.addBasicEvents();
-    APP.setupUI();
+    APP.UI.setup();
 
     APP.MATS.init();
 
@@ -87,27 +96,6 @@ APP.setup = ()=>{
 	});
 };
 
-/*
-    UI
-===================================*/
-APP.setupUI = ()=>{
-    ATON.UI.get("toolbar").append(
-        ATON.UI.createButtonFullscreen(),
-        ATON.UI.createButtonQR(),
-        ATON.UI.createButtonVR(),
-        ATON.UI.createButtonDeviceOrientation()
-    );
-
-    ATON.UI.get("user").append(
-        ATON.UI.createButtonUser({
-            titlelogin: "MetaMic Login"
-        })
-    );
-
-    ATON.UI.get("toolbar-bottom").append(
-        ATON.UI.createButtonHome()
-    );
-};
 
 // Semantics
 APP.showSemanticPanel = (title, elContent)=>{
@@ -434,21 +422,7 @@ APP.loadSpace = (spaceid, portalid)=>{
             }
 
             if (n === "present"){
-                let elP = ATON.UI.createButton({
-                    text: "Context",
-                    icon: APP.pathResIcons+"context.png", //"bi-building-fill",
-                    classes: "aton-btn-highlight",
-                    onpress: ()=>{
-                        //let P = ATON.getSceneNode("present");
-                        //P.toggle();
-                        N.toggle();
-
-                        if (P.visible) elP.classList.add("aton-btn-highlight");
-                        else elP.classList.remove("aton-btn-highlight");
-                    }
-                })
-
-                ATON.UI.get("toolbar-bottom").append(elP);
+                ATON.UI.get("toolbar-bottom").append( APP.UI.createContextButton(N) );
             }
 
             if (n.startsWith("H-")){
@@ -468,28 +442,10 @@ APP.loadSpace = (spaceid, portalid)=>{
                     hlist.push({title: APP._hyNode.children[h].nid, value:h });
                 }
 
-                let elHySelect = ATON.UI.createSelect({
-                    items: hlist,
-                    value: 0,
-                    title: "Hypotheses",
-                    onselect: (v)=>{
-                        APP.setCurrSpaceHypothesis(v);
-                    }
-                });
-                let elHyG = ATON.UI.createContainer({style:"max-width:400px; display:inline-block"});
-                elHyG.append(elHySelect);
-
-                ATON.UI.get("toolbar-bottom").append(elHyG);
+                ATON.UI.get("toolbar-bottom").append( APP.UI.createDropdownHypotheses(hlist) );
             }
 
-            ATON.UI.get("toolbar").prepend(
-                ATON.UI.createButton({
-                    icon: APP.pathResIcons+"logo.png",
-                    onpress: ()=>{
-                        window.location.href = APP.basePath + "?s=intro";
-                    }
-                })
-            );
+            ATON.UI.get("toolbar").prepend( APP.UI.createIntroButton() );
 
             let elProg = ATON.UI.createButton({
                 icon: APP.pathResIcons+"recprog.png", //"bi-puzzle-fill",
