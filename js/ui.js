@@ -24,7 +24,14 @@ UI.setup = ()=>{
 };
 
 UI.modalWelcome = ()=>{
+    let elBody = ATON.UI.createContainer();
 
+    //elBody.append()
+
+    ATON.UI.showModal({
+        header: "Welcome",
+        body: elBody
+    });
 };
 
 UI.createIntroButton = ()=>{

@@ -300,6 +300,13 @@ APP.setupEvents = ()=>{
 
             ATON.updateLightProbes();
         }
+
+		if (k==='.'){
+            let P = ATON.getSceneQueriedPoint();
+            if (!P) return;
+
+            console.log([P.x, P.y, P.z]);
+		}
     });
     ATON.on("KeyUp",(k)=>{
         if (k === ' ' || k === 'Space'){
