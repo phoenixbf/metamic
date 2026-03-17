@@ -18,18 +18,61 @@ constructor(spaceid){
     this._bProxUser = false;
     this._tEnterProx = undefined;
 
-    this._label = undefined;
+    this.setupLabel();
 }
 
-setTitle(str){
+setupLabel(){
+    this._label = new ATON.SUI.Label(undefined, 0.6, 0.15);
+    this._label.setPosition(0,0.8,0.5).setScale(1.5);
+    this._label.attachTo(this);
+
+    //for (let c in this._label.container.children) this._label.container.remove(this._label.container.children[c]);
+}
+
+setLabelInfo(title, location, period){
+    //this._label.uiText.visible = false;
+    this._label.setText("\n");
+
+    const C = this._label.container;
+
+    //C.remove(this._label.uiText);
+/*
     if (!this._label){
-        this._label = new ATON.SUI.Label(undefined, 0.4);
-        this._label.setPosition(0,0.9,0.51).setScale(2);
+        this._label = new ATON.SUI.Label(undefined, 0.6, 0.1);
+        this._label.setPosition(0,0.85,0.5).setScale(1.5);
         this._label.attachTo(this);
     }
 
     this._label.setText(str);
     this._label.setTextColor(APP.MATS.Colors.main);
+*/
+
+    // Title
+    if (location) C.add(
+        new ThreeMeshUI.Text({ 
+            content: location+"\n",
+            fontSize: 0.03,
+            fontColor: APP.MATS.Colors.main
+        })
+    );
+
+    if (title) C.add(
+        new ThreeMeshUI.Text({ 
+            content: title+"\n",
+            fontSize: 0.035,
+            fontColor: ATON.MatHub.colors.white
+        })
+    );
+
+    if (period) C.add(
+        new ThreeMeshUI.Text({ 
+            content: period+"\n",
+            fontSize: 0.02,
+            fontColor: APP.MATS.Colors.main
+        })
+    );
+
+    ThreeMeshUI.update();
 }
 
 addDrawings(list){

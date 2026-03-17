@@ -45,6 +45,10 @@ APP.setup = ()=>{
     APP._bSupportXR = false;
 
     APP._mode = APP.MODE_INSPECTION;
+
+    // Custom fonts
+    ATON.SUI.PATH_FONT_JSON = APP.pathResAssets + "fonts/georgia-msdf.json";
+    ATON.SUI.PATH_FONT_TEX  = APP.pathResAssets + "fonts/georgia.png";
     
     APP._currSpaceID = undefined;
     APP._layers = [];
@@ -612,24 +616,33 @@ APP.realizeIntroSpace = ()=>{
     if (!totems) return;
 
     let numTotems = totems.length;
-    let rad = 6.0;
+    let rad = 8.0;
 
     for (let s in totems){
         const S = totems[s];
 
         APP._totems[S.dstspace] = new Totem(S.dstspace);
         APP._totems[S.dstspace].addDrawings(S.drawings);
-        APP._totems[S.dstspace].setTitle(S.label);
+
+        let title    = APP.confdata.spaces[S.dstspace].title;
+        let location = APP.confdata.spaces[S.dstspace].location;
+        let period   = APP.confdata.spaces[S.dstspace].period;
+        //if (title) APP._totems[S.dstspace].setTitle(title);
+
+        APP._totems[S.dstspace].setLabelInfo(title, location, period);
         
         //APP._totems[S.dstspace].setPosition(S.pos[0], 0.0, S.pos[1]);
 
         let c = (parseInt(s)/numTotems) * Math.PI;
         c += (Math.PI/numTotems)*0.5;
 
+        //let ring = (s % 2) * 0.4;
+        //ring += 1.0;
+
         APP._totems[S.dstspace].setPosition(
-            -Math.cos(c) * rad,
+            -Math.cos(c) * rad, //* ring,
             0.0,
-            -Math.sin(c) * rad,
+            -Math.sin(c) * rad //* ring,
         );
 
         APP._totems[S.dstspace].orientToLocation(0,0,0);
