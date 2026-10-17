@@ -8,7 +8,7 @@ MATS.init = ()=>{
     MATS.Colors.draw = new THREE.Color("#ede7dd");
 
     MATS.introStand = new THREE.MeshStandardMaterial();
-    MATS.introStand.color = new THREE.Color(0.1,0.1,0.1);
+    MATS.introStand.color = new THREE.Color(0.01,0.01,0.01);
 
     MATS._customvshader = `
         varying vec3 vPositionW;
@@ -60,7 +60,7 @@ MATS.init = ()=>{
         //transparent: true,
         depthWrite: false,
         depthTest: false,
-        //opacity: 0.2,
+        opacity: 0.2,
 		blending: THREE.AdditiveBlending
     });
 
@@ -108,7 +108,7 @@ MATS.init = ()=>{
         map: texHalo,
         transparent: true,
         depthWrite: false,
-        opacity: 0.5,
+        opacity: 0.2,
 		blending: THREE.AdditiveBlending
     });
 
@@ -120,7 +120,7 @@ MATS.init = ()=>{
         depthWrite: false,
         depthTest: false,
         
-        opacity: 0.7,
+        opacity: 0.2,
 		
         blending: THREE.AdditiveBlending    
     });
