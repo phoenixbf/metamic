@@ -35,6 +35,8 @@ MATS.init = ()=>{
     MATS.introGround = new THREE.MeshStandardMaterial();
     ATON.Utils.loadTexture(APP.pathResAssets + "introground.jpg", (tex)=>{
         MATS.introGround.map = tex;
+        MATS.introGround.map.colorSpace = ATON._stdEncoding;
+        
         MATS.introGround.map.wrapS = THREE.RepeatWrapping;
         MATS.introGround.map.wrapT = THREE.RepeatWrapping;
 
@@ -52,6 +54,8 @@ MATS.init = ()=>{
 
     ATON.Utils.loadTexture(APP.pathResAssets+ "cshadow.jpg", (tex)=>{
         APP.MATS.cshadow.map = tex;
+        APP.MATS.cshadow.map.colorSpace = ATON._stdEncoding;
+        
         APP.MATS.cshadow.needsUpdate = true;
     });
 
@@ -60,12 +64,13 @@ MATS.init = ()=>{
         //transparent: true,
         depthWrite: false,
         depthTest: false,
-        opacity: 0.2,
+        opacity: 0.4,
 		blending: THREE.AdditiveBlending
     });
 
     ATON.Utils.loadTexture(APP.pathResAssets+ "spotray.jpg", (tex)=>{
         APP.MATS.introSpotRay.map = tex;
+        APP.MATS.introSpotRay.map.colorSpace = ATON._stdEncoding;
         APP.MATS.introSpotRay.needsUpdate = true;
     });
 
@@ -101,11 +106,9 @@ MATS.init = ()=>{
         //forceSinglePass: true,
     });
 
-    let texHalo = ATON.Utils.loadTexture( APP.pathResAssets + "halo.jpg" );
-
     MATS.halo = new THREE.MeshBasicMaterial({
         color: ATON.MatHub.colors.white,
-        map: texHalo,
+        //map: texHalo,
         transparent: true,
         depthWrite: false,
         opacity: 0.5,
@@ -114,15 +117,25 @@ MATS.init = ()=>{
 
     MATS.haloSprite = new THREE.SpriteMaterial({
         color: MATS.Colors.main,
-        map: texHalo,
+        //map: texHalo,
         transparent: true,
 
         depthWrite: false,
         depthTest: false,
         
-        opacity: 0.2,
+        opacity: 0.5,
 		
         blending: THREE.AdditiveBlending    
+    });
+
+    ATON.Utils.loadTexture( APP.pathResAssets + "halo.jpg", (tex)=>{
+        APP.MATS.halo.map = tex;
+        APP.MATS.halo.map.colorSpace = ATON._stdEncoding;
+        APP.MATS.halo.needsUpdate = true;
+
+        APP.MATS.haloSprite.map = tex;
+        APP.MATS.haloSprite.map.colorSpace = ATON._stdEncoding;
+        APP.MATS.haloSprite.needsUpdate = true;
     });
 
     MATS.arch1 = new THREE.ShaderMaterial({
