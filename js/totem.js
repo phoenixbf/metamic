@@ -177,7 +177,7 @@ realize(){
 
     this.maquette.load(APP.pathResAssets+"maquettes/"+this._spaceid+".glb", ()=>{
         this.maquette.autoFit(new THREE.Vector3(0,0,0), 0.6);
-        this.maquette.setPosition(0,1.0,0);
+        this.maquette.setPosition(0, 1.05, 0);
         this.maquette.setMaterial( APP.MATS.maquette );
         
         //this.maquette.renderOrder = 10;
@@ -189,7 +189,11 @@ realize(){
 
         this.drawing = this.maquette.clone();
         this.drawing.setPosition(0,1,0); // -0.5
+
         this.drawing.scale.y = this._mqScale * 0.01;
+        //this.drawing.scale.x = this._mqScale * 1.1;
+        //this.drawing.scale.z = this._mqScale * 1.1;
+
         this.drawing.setMaterial(APP.MATS.maquetteproj);
 
         //this.drawing.renderOrder = 100;

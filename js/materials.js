@@ -108,7 +108,7 @@ MATS.init = ()=>{
         map: texHalo,
         transparent: true,
         depthWrite: false,
-        opacity: 0.2,
+        opacity: 0.5,
 		blending: THREE.AdditiveBlending
     });
 
